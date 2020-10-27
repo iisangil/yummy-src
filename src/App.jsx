@@ -26,6 +26,23 @@ class App extends React.Component {
     this.leaveGroup = this.leaveGroup.bind(this);
   }
 
+  // componentDidUpdate() {
+  //   this.pubNubClient.addListener({
+  //     message: function(msg) {
+  //       let info = {
+  //         "sender": msg.publisher,
+  //         "message": msg.message,
+  //       };
+  //       let { messages } = this.state;
+  //       messages.concat(info);
+  //       this.setState({
+  //         messages,
+  //       });
+  //       console.log(msg);
+  //     }
+  //   })
+  // }
+
   createGroup() {
     this.pubNubClient = new PubNub(pubNubConfig.keySet);
 
