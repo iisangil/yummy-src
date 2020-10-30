@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"time"
 
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
@@ -24,27 +25,34 @@ func apiResponse(w http.ResponseWriter, r *http.Request) {
 
 // Post is for testing insertion into database
 type Post struct {
-	title string `json:”title,omitempty”` // idk why this has warning
-	body  string `json:”body,omitempty”`
+	Title string `json:"title"`
+	Body  string `json:"body"`
 }
 
 // insert a test data thing into the test collection
 func insertTest(title string, body string) {
-	fmt.Println("func start")
 	post := Post{"hello", "goodbye"}
 	collection := client.Database("yummyDb").Collection("tests")
-	fmt.Println("got database collection")
 	insertResult, err := collection.InsertOne(context.TODO(), post)
-	fmt.Println("inserted")
 	if err != nil {
 		log.Fatal(err)
 	}
 	fmt.Println("Inserted post with ID:", insertResult.InsertedID)
 }
 
+func getTest() {
+	collection := client.Database("yummyDb").Collection("tests")
+	filter := bson.D{}
+	var post Post
+	err := collection.FindOne(context.TODO(), filter).Decode(&post)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println("Found post with title ", post.Title)
+}
+
 func main() {
 	// taken from https://docs.mongodb.com/drivers/go
-	// Replace the uri string with your MongoDB deployment's connection string.
 	uri := "mongodb+srv://dbUser:dbUserPassword@cluster0.htrlj.mongodb.net/yummyDb?retryWrites=true&w=majority"
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
@@ -65,6 +73,7 @@ func main() {
 	fmt.Println("Successfully connected and pinged.")
 
 	// insertTest("hello", "goodbye")
+	// getTest()
 
 	http.HandleFunc("/login", login)
 	http.HandleFunc("/create", createGroup)
@@ -73,8 +82,10 @@ func main() {
 
 func login(w http.ResponseWriter, r *http.Request) {
 	// login with phone number
+
 }
 
 func createGroup(w http.ResponseWriter, r *http.Request) {
 	// implement this part
+
 }
