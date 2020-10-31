@@ -2,8 +2,8 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
-	"io"
 	"log"
 	"net/http"
 	"time"
@@ -21,6 +21,17 @@ var self string
 type Post struct {
 	Title string `json:"title"`
 	Body  string `json:"body"`
+}
+
+// Response is for api endpoint responses
+type Response struct {
+	Message string `json:"message"`
+}
+
+// User is for users in database
+type User struct {
+	ID    string `json:"id"`
+	Group string `json:"group"`
 }
 
 func main() {
@@ -47,13 +58,6 @@ func main() {
 	http.HandleFunc("/login", login)
 	http.HandleFunc("/create", createGroup)
 	log.Fatal(http.ListenAndServe(":8080", nil))
-}
-
-func respond(r http.ResponseWriter, msg string) {
-	_, err := io.WriteString(r, msg)
-	if err != nil {
-		panic(err)
-	}
 }
 
 // insert a test data thing into the test collection
@@ -85,13 +89,21 @@ func login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	if err := r.ParseForm(); err != nil {
-		respond(w, "INVALID FORM")
+		response := Response{"Invalid form."}
+		json.NewEncoder(w).Encode(response)
 		return
 	}
 	self = r.FormValue("phone")
 	// add user to database
+	user := User{self, ""}
+	collection := client.Database("yummyDb").Collection("users")
+	insertResult, err := collection.InsertOne(context.TODO(), user)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println("Inserted user with ID:", insertResult.InsertedID)
 
-	respond(w, "LOGIN "+self+" SUCCESSFUL")
+	json.NewEncoder(w).Encode(user)
 }
 
 func createGroup(w http.ResponseWriter, r *http.Request) {

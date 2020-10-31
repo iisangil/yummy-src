@@ -6,6 +6,7 @@ import * as firebase from 'firebase/app';
 import 'firebase/auth';
 import NumberFormat from 'react-number-format';
 
+const axios = require('axios').default;
 
 class App extends React.Component {
   constructor() {
@@ -92,6 +93,21 @@ class App extends React.Component {
         messageSent: false,
         user: result.user,
       });
+
+      const { phone } = this.state;
+      axios({
+        method: 'POST',
+        url: 'localhost:8080/login',
+        data: {
+          ID: phone,
+          group: '',
+        }
+      }).then((result) => {
+        console.log(result);
+      }).catch((err) => {
+        console.log(err);
+      });
+
       console.log("Successfully logged in!");
       // ...
     }).catch(function (error) {
