@@ -39,7 +39,6 @@ class App extends React.Component {
     });
 
     firebase.auth().onAuthStateChanged((user) => {
-      console.log(user);
       if (user) {
         // User is signed in.
         this.setState({
@@ -50,8 +49,6 @@ class App extends React.Component {
             phone: profile.uid,
           });
         });
-      } else {
-        // No user is signed in.
       }
     });
   }
@@ -60,7 +57,6 @@ class App extends React.Component {
     e.preventDefault();
 
     const { phone } = this.state;
-    console.log(phone);
     const appVerifier = window.recaptchaVerifier;
     firebase.auth().signInWithPhoneNumber(phone, appVerifier)
     .then((confirmationResult) => {
@@ -70,6 +66,7 @@ class App extends React.Component {
       this.setState({
         messageSent: true,
       });
+      console.log("SMS sent!");
     }).catch(function (error) {
       // Error; SMS not sent
       // ...
@@ -95,6 +92,7 @@ class App extends React.Component {
         messageSent: false,
         user: result.user,
       });
+      console.log("Successfully logged in!");
       // ...
     }).catch(function (error) {
       // User couldn't sign in (bad verification code?)
