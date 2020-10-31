@@ -21,6 +21,7 @@ class App extends React.Component {
     this.submitPhone = this.submitPhone.bind(this);
     this.inputCode = this.inputCode.bind(this);
     this.submitCode = this.submitCode.bind(this);
+    this.signOut = this.signOut.bind(this);
   }
 
   componentDidMount() {
@@ -34,6 +35,23 @@ class App extends React.Component {
       'callback': function(response) {
         // reCAPTCHA solved, allow signInWithPhoneNumber.
         console.log("Captcha solved!");
+      }
+    });
+
+    firebase.auth().onAuthStateChanged((user) => {
+      console.log(user);
+      if (user) {
+        // User is signed in.
+        this.setState({
+          loggedIn: true,
+        });
+        user.providerData.forEach((profile) => {
+          this.setState({
+            phone: profile.uid,
+          });
+        });
+      } else {
+        // No user is signed in.
       }
     });
   }
@@ -86,6 +104,19 @@ class App extends React.Component {
     });
   }
 
+  signOut(e) {
+    e.preventDefault();
+
+    firebase.auth().signOut().then(() => {
+      this.setState({
+        loggedIn: false,
+      });
+    }).catch((error) => {
+      console.log(error);
+      alert("There was an error when signing out.");
+    })
+  }
+
 
   render() {
     return (
@@ -95,7 +126,7 @@ class App extends React.Component {
           <form onSubmit={this.submitPhone}>
             <label>
               Enter Phone Number:
-              <NumberFormat format="+1 (###) ###-####" mask="_" value={this.state.phone} onValueChange={(values) => {
+              <NumberFormat format="+1 (###) ###-####" allowEmptyFormatting mask="_" value={this.state.phone} onValueChange={(values) => {
                 const { formattedValue } = values;
                 this.setState({
                   phone: formattedValue,
@@ -121,7 +152,9 @@ class App extends React.Component {
       {
         this.state.loggedIn &&
         <div>
-          do stuff
+          <form onSubmit={this.signOut}>
+            <input type="submit" value="Log out"></input>
+          </form>
         </div>
       }
       </div>
