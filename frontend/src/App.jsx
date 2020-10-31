@@ -5,6 +5,7 @@ import firebaseConfig from './firebaseConfig';
 import * as firebase from 'firebase/app';
 import 'firebase/auth';
 import NumberFormat from 'react-number-format';
+import { nanoid } from 'nanoid';
 
 const axios = require('axios').default;
 
@@ -15,6 +16,7 @@ class App extends React.Component {
     this.state = {
       loggedIn: false,
       messageSent: false,
+      inGroup: false,
       phone: '',
       code: '',
       user: '',
@@ -23,6 +25,8 @@ class App extends React.Component {
     this.inputCode = this.inputCode.bind(this);
     this.submitCode = this.submitCode.bind(this);
     this.signOut = this.signOut.bind(this);
+    this.createGroup = this.createGroup.bind(this);
+    this.joinGroup = this.joinGroup.bind(this);
   }
 
   componentDidMount() {
@@ -97,10 +101,10 @@ class App extends React.Component {
       const { phone } = this.state;
       axios({
         method: 'POST',
-        url: 'localhost:8080/login',
+        url: 'http://localhost:8080/login',
         data: {
-          ID: phone,
-          group: '',
+          userid: phone,
+          groupid: '',
         }
       }).then((result) => {
         console.log(result);
@@ -116,6 +120,37 @@ class App extends React.Component {
       alert("User couldn't sign in (bad verification code?");
       console.log(error);
     });
+  }
+
+  createGroup(e) {
+    e.preventDefault();
+
+    var groupid = nanoid(6);
+    const { phone } = this.state;
+
+    var userArray = [
+      { "userid": phone, groupid, }
+    ];
+
+    axios({
+      method: 'POST',
+      url: 'http://localhost:8080/create',
+      data: {
+        groupid,
+        users: userArray,
+      }
+    }).then((result) => {
+      console.log(result);
+      console.log("Successfully created group!");
+    }).catch((err) => {
+      console.log(err);
+    });
+  }
+
+  joinGroup(e) {
+    e.preventDefault();
+
+
   }
 
   signOut(e) {
@@ -164,8 +199,14 @@ class App extends React.Component {
         </div>
       }
       {
-        this.state.loggedIn &&
+        this.state.loggedIn && !this.state.inGroup &&
         <div>
+          <form onSubmit={this.createGroup}>
+            <input type="submit" value="Create Group"></input>
+          </form>
+          <form onSubmit={this.joinGroup}>
+            <input type="submit" value="Join group"></input>
+          </form>
           <form onSubmit={this.signOut}>
             <input type="submit" value="Log out"></input>
           </form>

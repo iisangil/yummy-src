@@ -8,7 +8,9 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/rs/cors"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
@@ -16,12 +18,7 @@ import (
 
 var client *mongo.Client
 var self string
-
-// Post is for testing insertion into database
-type Post struct {
-	Title string `json:"title"`
-	Body  string `json:"body"`
-}
+var group string
 
 // Response is for api endpoint responses
 type Response struct {
@@ -30,8 +27,14 @@ type Response struct {
 
 // User is for users in database
 type User struct {
-	ID    string `json:"id"`
-	Group string `json:"group"`
+	UserID string `json:"userid"`
+	Group  string `json:"groupid"`
+}
+
+// Group is for groups in database
+type Group struct {
+	GroupID string `json:"groupid"`
+	Users   []User `json:"users"`
 }
 
 func main() {
@@ -55,58 +58,102 @@ func main() {
 	}
 	fmt.Println("Successfully connected and pinged.")
 
-	http.HandleFunc("/login", login)
-	http.HandleFunc("/create", createGroup)
-	log.Fatal(http.ListenAndServe(":8080", nil))
-}
+	mux := http.NewServeMux()
+	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.Write([]byte("{\"hello\": \"world\"}"))
+	})
+	mux.HandleFunc("/login", login)
+	mux.HandleFunc("/create", createGroup)
 
-// insert a test data thing into the test collection
-func insertTest(title string, body string) {
-	post := Post{"hello", "goodbye"}
-	collection := client.Database("yummyDb").Collection("tests")
-	insertResult, err := collection.InsertOne(context.TODO(), post)
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println("Inserted post with ID:", insertResult.InsertedID)
+	handler := cors.Default().Handler(mux)
+	log.Fatal(http.ListenAndServe(":8080", handler))
 }
 
 func getTest() {
-	collection := client.Database("yummyDb").Collection("tests")
-	filter := bson.D{}
-	var post Post
-	err := collection.FindOne(context.TODO(), filter).Decode(&post)
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println("Found post with title ", post.Title)
+	// collection := client.Database("yummyDb").Collection("tests")
+	// filter := bson.D{}
+	// var post Post
+	// err := collection.FindOne(context.TODO(), filter).Decode(&post)
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
+	// fmt.Println("Found post with title ", post.Title)
 }
 
 func login(w http.ResponseWriter, r *http.Request) {
 	// login with phone number
 	if r.Method != "POST" {
-		http.Error(w, "This is the login page.", 405)
+		http.Error(w, "Invalid Method", 405)
 		return
 	}
-	if err := r.ParseForm(); err != nil {
-		response := Response{"Invalid form."}
-		json.NewEncoder(w).Encode(response)
+	var u User
+	err := json.NewDecoder(r.Body).Decode(&u)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	self = r.FormValue("phone")
+
+	self = u.UserID
+	if self == "" {
+		http.Error(w, "Invalid Form", http.StatusBadRequest)
+		return
+	}
 	// add user to database
-	user := User{self, ""}
 	collection := client.Database("yummyDb").Collection("users")
-	insertResult, err := collection.InsertOne(context.TODO(), user)
+	insertResult, err := collection.InsertOne(context.TODO(), u)
 	if err != nil {
 		log.Fatal(err)
 	}
 	fmt.Println("Inserted user with ID:", insertResult.InsertedID)
 
-	json.NewEncoder(w).Encode(user)
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(u)
 }
 
 func createGroup(w http.ResponseWriter, r *http.Request) {
 	// implement this part
+	if r.Method != "POST" {
+		http.Error(w, "Invalid Method", 405)
+		return
+	}
+	var g Group
+	err := json.NewDecoder(r.Body).Decode(&g)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
 
+	group = g.GroupID
+	if group == "" {
+		http.Error(w, "Invalid Form", http.StatusBadRequest)
+		return
+	}
+
+	collection := client.Database("yummyDb").Collection("groups")
+	insertResult, err := collection.InsertOne(context.TODO(), g)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println("Inserted group with ID:", insertResult.InsertedID)
+
+	collection = client.Database("yummyDb").Collection("users")
+	updateResult, err := collection.UpdateOne(
+		context.Background(),
+		bson.D{
+			primitive.E{Key: "userid", Value: self},
+		},
+		bson.D{
+			primitive.E{Key: "$set", Value: bson.D{
+				primitive.E{Key: "group", Value: group},
+			}},
+		},
+	)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println("Updated user with ID:", updateResult.UpsertedID)
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(g)
 }
