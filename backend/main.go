@@ -101,11 +101,11 @@ func login(w http.ResponseWriter, r *http.Request) {
 	}
 	// add user to database
 	collection := client.Database("yummyDb").Collection("users")
-	insertResult, err := collection.InsertOne(context.TODO(), u)
+	_, err = collection.InsertOne(context.TODO(), u)
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println("Inserted user with ID:", insertResult.InsertedID)
+	fmt.Println("Inserted user!")
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(u)
@@ -131,14 +131,14 @@ func createGroup(w http.ResponseWriter, r *http.Request) {
 	}
 
 	collection := client.Database("yummyDb").Collection("groups")
-	insertResult, err := collection.InsertOne(context.TODO(), g)
+	_, err = collection.InsertOne(context.TODO(), g)
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println("Inserted group with ID:", insertResult.InsertedID)
+	fmt.Println("Inserted group!")
 
 	collection = client.Database("yummyDb").Collection("users")
-	updateResult, err := collection.UpdateOne(
+	_, err = collection.UpdateOne(
 		context.Background(),
 		bson.D{
 			primitive.E{Key: "userid", Value: self},
@@ -152,7 +152,7 @@ func createGroup(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println("Updated user with ID:", updateResult.UpsertedID)
+	fmt.Println("Updated user!")
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(g)

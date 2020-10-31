@@ -20,6 +20,7 @@ class App extends React.Component {
       phone: '',
       code: '',
       user: '',
+      group: '',
     };
     this.submitPhone = this.submitPhone.bind(this);
     this.inputCode = this.inputCode.bind(this);
@@ -142,6 +143,10 @@ class App extends React.Component {
     }).then((result) => {
       console.log(result);
       console.log("Successfully created group!");
+      this.setState({
+        group: groupid,
+        inGroup: true,
+      });
     }).catch((err) => {
       console.log(err);
     });
@@ -168,6 +173,7 @@ class App extends React.Component {
 
 
   render() {
+    const { group } = this.state;
     return (
       <div>
       { !this.state.loggedIn && !this.state.messageSent &&
@@ -210,6 +216,12 @@ class App extends React.Component {
           <form onSubmit={this.signOut}>
             <input type="submit" value="Log out"></input>
           </form>
+        </div>
+      }
+      {
+        this.state.loggedIn && this.state.inGroup &&
+        <div>
+          Share this code with your friends: {group}
         </div>
       }
       </div>
