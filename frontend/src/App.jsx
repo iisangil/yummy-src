@@ -1,8 +1,10 @@
 // import logo from './logo.svg';
 // import './App.css';
 import React from 'react';
-import Messages from './Messages'
-import { nanoid } from 'nanoid';
+import firebaseConfig from './firebaseConfig';
+import * as firebase from 'firebase/app';
+import 'firebase/auth';
+import NumberFormat from 'react-number-format';
 
 
 class App extends React.Component {
@@ -10,33 +12,51 @@ class App extends React.Component {
     super();
 
     this.state = {
-      groupID: '',
-      inGroup: false,
-      joining: false,
+      loggedIn: false,
+      messageSent: false,
+      phone: '',
       code: '',
-      message: '',
-    }
-    this.createGroup = this.createGroup.bind(this);
-    this.joinGroup = this.joinGroup.bind(this);
+      user: '',
+    };
+    this.submitPhone = this.submitPhone.bind(this);
     this.inputCode = this.inputCode.bind(this);
     this.submitCode = this.submitCode.bind(this);
-    this.leaveGroup = this.leaveGroup.bind(this);
   }
 
-  createGroup() {
-    let groupID = nanoid(6);
+  componentDidMount() {
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig);
+   }
+    firebase.auth().useDeviceLanguage();
 
-    alert("Share this group code with your friends: " + groupID);
-
-    this.setState({
-      groupID,
-      inGroup: true,
+    window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('sign-in-button', {
+      'size': 'invisible',
+      'callback': function(response) {
+        // reCAPTCHA solved, allow signInWithPhoneNumber.
+        console.log("Captcha solved!");
+      }
     });
   }
 
-  joinGroup() {
-    this.setState({
-      joining: true,
+  submitPhone(e) {
+    e.preventDefault();
+
+    const { phone } = this.state;
+    console.log(phone);
+    const appVerifier = window.recaptchaVerifier;
+    firebase.auth().signInWithPhoneNumber(phone, appVerifier)
+    .then((confirmationResult) => {
+      // SMS sent. Prompt user to type the code from the message, then sign the
+      // user in with confirmationResult.confirm(code).
+      window.confirmationResult = confirmationResult;
+      this.setState({
+        messageSent: true,
+      });
+    }).catch(function (error) {
+      // Error; SMS not sent
+      // ...
+      alert("Error: SMS not sent.");
+      console.log(error);
     });
   }
 
@@ -49,64 +69,61 @@ class App extends React.Component {
   submitCode(e) {
     e.preventDefault();
 
-    let groupID = this.state.code;
-    console.log(groupID);
-
-    this.setState({
-      groupID,
-      inGroup: true,
-      joining: false,
-      code: '',
+    const { code } = this.state;
+    window.confirmationResult.confirm(code).then((result) => {
+      // User signed in successfully.
+      this.setState({
+        loggedIn: true,
+        messageSent: false,
+        user: result.user,
+      });
+      // ...
+    }).catch(function (error) {
+      // User couldn't sign in (bad verification code?)
+      // ...
+      alert("User couldn't sign in (bad verification code?");
+      console.log(error);
     });
   }
 
-  leaveGroup() {
-    this.setState({
-      inGroup: false,
-      joining: false,
-    })
-  }
 
   render() {
     return (
       <div>
-        <header>
-          <p>
-            Yummy
-          </p>
-        </header>
-        {
-          !this.state.inGroup && !this.state.joining &&
-          <div>
-            <button onClick={this.createGroup}>
-              Create a Group
-            </button>
-            <button onClick={this.joinGroup}>
-              Join a Group
-            </button>
-          </div>
-        }
-        {
-          !this.state.inGroup && this.state.joining &&
-          <div>
-            <form onSubmit={this.submitCode}>
-              <label>
-                Group Code:
-                <input type="text" value={this.state.code} onChange={this.inputCode}></input>
-              </label>
-              <input type="submit" value="Submit"></input>
-            </form>
-          </div>
-        }
-        {
-          this.state.inGroup &&
-          <div>
-            <button onClick={this.leaveGroup}>
-              Leave Group
-            </button>
-          {/* messages */}
-          </div>
-        }
+      { !this.state.loggedIn && !this.state.messageSent &&
+        <div>
+          <form onSubmit={this.submitPhone}>
+            <label>
+              Enter Phone Number:
+              <NumberFormat format="+1 (###) ###-####" mask="_" value={this.state.phone} onValueChange={(values) => {
+                const { formattedValue } = values;
+                this.setState({
+                  phone: formattedValue,
+                });
+              }}/>
+            </label>
+            <input id="sign-in-button" type="submit" value="Submit"></input>
+          </form>
+        </div>
+      }
+      {
+        !this.state.loggedIn && this.state.messageSent &&
+        <div>
+          <form onSubmit={this.submitCode}>
+            <label>
+              Input Code:
+              <input type="text" value={this.state.code} onChange={this.inputCode}></input>
+            </label>
+            <input type="submit" value="Submit"></input>
+          </form>
+        </div>
+      }
+      {
+        this.state.loggedIn &&
+        <div>
+          do stuff
+        </div>
+      }
       </div>
     )
   }
