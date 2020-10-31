@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"time"
@@ -15,13 +16,6 @@ import (
 
 var client *mongo.Client
 var self string
-
-// change the functions to handle different endpoints and methods
-func apiResponse(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(http.StatusOK)
-	w.Header().Set("Content-Type", "application/json")
-	w.Write([]byte(`{"message":"hello world!"}`))
-}
 
 // Post is for testing insertion into database
 type Post struct {
@@ -55,6 +49,13 @@ func main() {
 	log.Fatal(http.ListenAndServe(":8080", nil))
 }
 
+func respond(r http.ResponseWriter, msg string) {
+	_, err := io.WriteString(r, msg)
+	if err != nil {
+		panic(err)
+	}
+}
+
 // insert a test data thing into the test collection
 func insertTest(title string, body string) {
 	post := Post{"hello", "goodbye"}
@@ -83,6 +84,14 @@ func login(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "This is the login page.", 405)
 		return
 	}
+	if err := r.ParseForm(); err != nil {
+		respond(w, "INVALID FORM")
+		return
+	}
+	self = r.FormValue("phone")
+	// add user to database
+
+	respond(w, "LOGIN "+self+" SUCCESSFUL")
 }
 
 func createGroup(w http.ResponseWriter, r *http.Request) {
