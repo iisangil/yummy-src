@@ -35,6 +35,7 @@ type User struct {
 type Group struct {
 	GroupID string `json:"groupid"`
 	Users   []User `json:"users"`
+	Self    string `json:"self"`
 }
 
 func main() {
@@ -65,20 +66,10 @@ func main() {
 	})
 	mux.HandleFunc("/login", login)
 	mux.HandleFunc("/create", createGroup)
+	mux.HandleFunc("/join", joinGroup)
 
 	handler := cors.Default().Handler(mux)
 	log.Fatal(http.ListenAndServe(":8080", handler))
-}
-
-func getTest() {
-	// collection := client.Database("yummyDb").Collection("tests")
-	// filter := bson.D{}
-	// var post Post
-	// err := collection.FindOne(context.TODO(), filter).Decode(&post)
-	// if err != nil {
-	// 	log.Fatal(err)
-	// }
-	// fmt.Println("Found post with title ", post.Title)
 }
 
 func login(w http.ResponseWriter, r *http.Request) {
@@ -101,7 +92,7 @@ func login(w http.ResponseWriter, r *http.Request) {
 	}
 	// add user to database
 	collection := client.Database("yummyDb").Collection("users")
-	_, err = collection.InsertOne(context.TODO(), u)
+	_, err = collection.InsertOne(context.Background(), u)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -124,6 +115,7 @@ func createGroup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	self = g.Self
 	group = g.GroupID
 	if group == "" {
 		http.Error(w, "Invalid Form", http.StatusBadRequest)
@@ -131,11 +123,72 @@ func createGroup(w http.ResponseWriter, r *http.Request) {
 	}
 
 	collection := client.Database("yummyDb").Collection("groups")
-	_, err = collection.InsertOne(context.TODO(), g)
+	_, err = collection.InsertOne(context.Background(), g)
 	if err != nil {
 		log.Fatal(err)
 	}
 	fmt.Println("Inserted group!")
+
+	collection = client.Database("yummyDb").Collection("users")
+	_, err = collection.UpdateOne(
+		context.Background(),
+		bson.D{
+			primitive.E{Key: "userid", Value: self},
+		},
+		bson.D{
+			primitive.E{Key: "$set", Value: bson.D{
+				primitive.E{Key: "group", Value: group},
+			}},
+		},
+	)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println("Updated user!")
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(g)
+}
+
+func joinGroup(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		http.Error(w, "Invalid Method", 405)
+		return
+	}
+	var g Group
+	err := json.NewDecoder(r.Body).Decode(&g)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	self = g.Self
+	group = g.GroupID
+	if group == "" {
+		http.Error(w, "Invalid Form", http.StatusBadRequest)
+		return
+	}
+
+	collection := client.Database("yummyDb").Collection("groups")
+	_, err = collection.UpdateOne(
+		context.Background(),
+		bson.D{
+			primitive.E{Key: "groupid", Value: group},
+		},
+		bson.D{
+			primitive.E{Key: "$push", Value: bson.D{
+				primitive.E{Key: "users", Value: bson.D{
+					primitive.E{Key: "userid", Value: self},
+					primitive.E{Key: "groupid", Value: group},
+				}},
+			}},
+		},
+	)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println("after updating group self is", self)
+	fmt.Println("Updated group!")
 
 	collection = client.Database("yummyDb").Collection("users")
 	_, err = collection.UpdateOne(

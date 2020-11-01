@@ -27,6 +27,7 @@ class App extends React.Component {
     this.submitCode = this.submitCode.bind(this);
     this.signOut = this.signOut.bind(this);
     this.createGroup = this.createGroup.bind(this);
+    this.inputGroup = this.inputGroup.bind(this);
     this.joinGroup = this.joinGroup.bind(this);
   }
 
@@ -52,7 +53,7 @@ class App extends React.Component {
         });
         user.providerData.forEach((profile) => {
           this.setState({
-            phone: profile.uid,
+            user: profile.uid.substring(2,),
           });
         });
       }
@@ -96,15 +97,14 @@ class App extends React.Component {
       this.setState({
         loggedIn: true,
         messageSent: false,
-        user: result.user,
       });
 
-      const { phone } = this.state;
+      const { user } = this.state;
       axios({
         method: 'POST',
         url: 'http://localhost:8080/login',
         data: {
-          userid: phone,
+          userid: user,
           groupid: '',
         }
       }).then((result) => {
@@ -127,10 +127,10 @@ class App extends React.Component {
     e.preventDefault();
 
     var groupid = nanoid(6);
-    const { phone } = this.state;
+    const { user } = this.state;
 
     var userArray = [
-      { "userid": phone, groupid, }
+      { "userid": user, groupid, }
     ];
 
     axios({
@@ -139,6 +139,7 @@ class App extends React.Component {
       data: {
         groupid,
         users: userArray,
+        self: user,
       }
     }).then((result) => {
       console.log(result);
@@ -152,10 +153,33 @@ class App extends React.Component {
     });
   }
 
+  inputGroup(e) {
+    this.setState({
+      group: e.target.value,
+    });
+  }
+
   joinGroup(e) {
     e.preventDefault();
 
-
+    const { user, group } = this.state;
+    
+    axios({
+      method: 'POST',
+      url: 'http://localhost:8080/join',
+      data: {
+        groupid: group,
+        self: user,
+      }
+    }).then((result) => {
+      console.log(result);
+      console.log("Successfully joined group!");
+      this.setState({
+        inGroup: true,
+      });
+    }).catch((err) => {
+      console.log(err);
+    });
   }
 
   signOut(e) {
@@ -182,9 +206,10 @@ class App extends React.Component {
             <label>
               Enter Phone Number:
               <NumberFormat format="+1 (###) ###-####" allowEmptyFormatting mask="_" value={this.state.phone} onValueChange={(values) => {
-                const { formattedValue } = values;
+                const { value, formattedValue } = values;
                 this.setState({
                   phone: formattedValue,
+                  user: value,
                 });
               }}/>
             </label>
@@ -211,6 +236,10 @@ class App extends React.Component {
             <input type="submit" value="Create Group"></input>
           </form>
           <form onSubmit={this.joinGroup}>
+            <label>
+              Input Code:
+              <input type="text" value={this.state.group} onChange={this.inputGroup}></input>
+            </label>
             <input type="submit" value="Join group"></input>
           </form>
           <form onSubmit={this.signOut}>
@@ -221,7 +250,10 @@ class App extends React.Component {
       {
         this.state.loggedIn && this.state.inGroup &&
         <div>
-          Share this code with your friends: {group}
+          <h>Share this code with your friends: {group}</h>
+          <form onSubmit={this.signOut}>
+            <input type="submit" value="Log out"></input>
+          </form>
         </div>
       }
       </div>
