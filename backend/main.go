@@ -210,3 +210,62 @@ func joinGroup(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(g)
 }
+
+func leaveGroup(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		http.Error(w, "Invalid Method", 405)
+		return
+	}
+	// leave the group in database
+	var g Group
+	err := json.NewDecoder(r.Body).Decode(&g)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	self = g.Self
+	group = ""
+	g.GroupID = ""
+	for i, v := range g.Users {
+		if v.UserID == self {
+			g.Users[len(g.Users)-1], g.Users[i] = g.Users[i], g.Users[len(g.Users)-1]
+			break
+		}
+	}
+	g.Users = g.Users[:len(g.Users)-1]
+
+	collection := client.Database("yummyDb").Collection("groups")
+	_, err = collection.UpdateOne(
+		context.Background(),
+		bson.D{
+			primitive.E{Key: "groupid", Value: group},
+		},
+		bson.D{
+			primitive.E{Key: "$pull", Value: bson.D{
+				primitive.E{Key: "users", Value: self},
+			}},
+		},
+	)
+	fmt.Println("Left Group!")
+
+	collection = client.Database("yummyDb").Collection("users")
+	_, err = collection.UpdateOne(
+		context.Background(),
+		bson.D{
+			primitive.E{Key: "userid", Value: self},
+		},
+		bson.D{
+			primitive.E{Key: "$set", Value: bson.D{
+				primitive.E{Key: "group", Value: ""},
+			}},
+		},
+	)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println("Updated user!")
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(g)
+}

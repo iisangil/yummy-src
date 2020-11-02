@@ -195,6 +195,12 @@ class App extends React.Component {
     })
   }
 
+  leaveGroup(e) {
+    e.preventDefault();
+
+    // make call to api to leave group in database
+  }
+
 
   render() {
     const { group } = this.state;
@@ -252,7 +258,10 @@ class App extends React.Component {
         <div>
           <h>Share this code with your friends: {group}</h>
           <form onSubmit={this.signOut}>
-            <input type="submit" value="Log out"></input>
+            <input type="submit" value="Log Out"></input>
+          </form>
+          <form onSubmit={this.leaveGroup}>
+            <input type="submit" value="Leave Group"></input>
           </form>
         </div>
       }
