@@ -1,5 +1,10 @@
 import Head from 'next/head';
 import { useForm } from 'react-hook-form';
+import auth from '../config/firebase';
+
+const login = (number) => {
+    return auth
+}
 
 export default function SignIn() {
     const { register, errors, handleSubmit } = useForm();

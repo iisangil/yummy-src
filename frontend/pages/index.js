@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
+import auth from '../config/firebase';
 // import firebaseConfig from '../constants/firebaseConfig';
 // import * as firebase from 'firebase/app';
 // import 'firebase/auth';
@@ -14,9 +15,13 @@ export default function Home() {
   const router = useRouter();
 
   useEffect(() => {
-    if (!user) {
-      router.push("/signin")
-    }
+    auth.onAuthStateChanged((result) => {
+      if (result) {
+        user = result;
+      } else {
+        user = null;
+      }
+    })
   }, [user])
 
   return (
