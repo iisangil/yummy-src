@@ -7,19 +7,33 @@ import auth from '../config/firebase';
 // import * as firebase from 'firebase/app';
 // import 'firebase/auth';
 
-// get firebase login status
-const useUser = () => ({ user: null })
-
 export default function Home() {
-  const { user } = useUser();
+  const [user, setUser] = useState("");
   const router = useRouter();
+
+  const signOut = () => {
+    console.log("sign out begin")
+    auth.signOut().then(() => {
+      console.log("signed out");
+      setUser("");
+    }).catch((error) => {
+      console.log(error);
+      alert("There was an error when signing out.");
+    })
+  }
 
   useEffect(() => {
     auth.onAuthStateChanged((result) => {
       if (result) {
-        user = result;
+        result.providerData.forEach((profile) => {
+          if (profile.providerId === "phone") {
+            console.log("logged in already");
+            console.log(profile);
+            setUser(profile.uid.substring(2,));
+          }
+        });
       } else {
-        user = null;
+        router.push("/signin");
       }
     })
   }, [user])
@@ -36,9 +50,14 @@ export default function Home() {
           Welcome to Yummy!
         </h1>
 
-        <Link href="/signin">
-          <a>SIGN IN</a>
-        </Link>
+        { user !== "" && 
+          <div>
+            <div>Create a group, join a group</div>
+            <form onSubmit={signOut}>
+              <input type="submit" value="Sign Out"></input>
+            </form>
+          </div>
+        }
       </main>
     </div>
 )
