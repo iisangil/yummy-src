@@ -10,12 +10,10 @@ const firebaseConfig = {
     messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID,
     appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
     measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
-  };
+};
 
 if (!firebase.apps.length) {
-    firebase.initializeApp(firebaseConfig);
+  firebase.initializeApp(firebaseConfig);
 }
-const app = firebase.app();
-const auth = firebase.auth();
-export default auth;
-console.log(app.name ? 'Firebase Mode Activated!' : 'Firebase not working :(');
+
+export default firebase;
