@@ -5,6 +5,8 @@ import 'firebase/auth';
 import firebase from '../config/firebase';
 import NumberFormat from 'react-number-format';
 
+const axios = require('axios').default;
+
 class SignIn extends React.Component {
     constructor() {
         super();
@@ -23,6 +25,12 @@ class SignIn extends React.Component {
     }
 
     componentDidMount() {
+        // check if logged in already
+        firebase.auth().onAuthStateChanged((res) => {
+            if (res) {
+                Router.push("/");
+            }
+        });
         firebase.auth().useDeviceLanguage();
 
         window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('sign-in-button', {
@@ -78,13 +86,30 @@ class SignIn extends React.Component {
     submitCode(e) {
         e.preventDefault();
 
-        const { code } = this.state;
+        const { user, code } = this.state;
         window.confirmationResult.confirm(code).then((res) => {
             this.setState({
                 loggedIn: true,
                 messageSent: false,
             });
             console.log("Successfully logged in!");
+
+            axios({
+                method: 'post',
+                url: 'http://localhost:8080/login',
+                data: {
+                    userid: user,
+                    groupid: '',
+                },
+                params: {
+                    self: user,
+                }
+            }).then((res) => {
+                console.log(res);
+            }).catch((err) => {
+                console.log(err);
+            });
+
             Router.push("/");
         }).catch((err) => {
             alert("Couldn't sign in (bad verification  code?)");

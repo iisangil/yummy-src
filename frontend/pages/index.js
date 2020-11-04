@@ -11,17 +11,8 @@ export default function Home() {
   const [user, setUser] = useState("");
   const router = useRouter();
 
-  const signOut = () => {
-    firebase.auth().signOut().then(() => {
-      setUser("");
-      console.log("Successfully signed out.");
-    }).catch((error) => {
-      console.log(error);
-      alert("There was an error when signing out.");
-    })
-  }
-
   useEffect(() => {
+    // check if logged in
     firebase.auth().onAuthStateChanged((result) => {
       if (result) {
         result.providerData.forEach((profile) => {
@@ -33,7 +24,19 @@ export default function Home() {
         });
       }
     })
-  }, [user]);
+  }, []);
+
+  const signOut = (e) => {
+    e.preventDefault();
+
+    firebase.auth().signOut().then(() => {
+      setUser("");
+      console.log("Successfully signed out.");
+    }).catch((error) => {
+      console.log(error);
+      alert("There was an error when signing out.");
+    })
+  }
 
   return (
     <div>
@@ -48,8 +51,7 @@ export default function Home() {
         </h1>
         { user !== "" && 
           <div>
-            <Link href="/create"><input type="submit" value="Create Group"></input></Link>
-            <Link href="/join"><input type="submit" value="Join Group"></input></Link>
+            <Link href={"/groups?self="+user}><input type="submit" value="Groups"></input></Link>
             <form onSubmit={signOut}>
               <input type="submit" value="Sign Out"></input>
             </form>

@@ -78,6 +78,13 @@ func login(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid Method", 405)
 		return
 	}
+	r.ParseForm()
+	if r.FormValue("self") == "" {
+		http.Error(w, "Invalid Parameters", http.StatusBadRequest)
+	}
+	self = r.FormValue("self")
+	fmt.Println("Self is ", self)
+
 	var u User
 	err := json.NewDecoder(r.Body).Decode(&u)
 	if err != nil {
@@ -85,11 +92,6 @@ func login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	self = u.UserID
-	if self == "" {
-		http.Error(w, "Invalid Form", http.StatusBadRequest)
-		return
-	}
 	// add user to database
 	collection := client.Database("yummyDb").Collection("users")
 	_, err = collection.InsertOne(context.Background(), u)
@@ -98,8 +100,11 @@ func login(w http.ResponseWriter, r *http.Request) {
 	}
 	fmt.Println("Inserted user!")
 
+	var re Response
+	re.Message = "success"
+
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(u)
+	json.NewEncoder(w).Encode(re)
 }
 
 func createGroup(w http.ResponseWriter, r *http.Request) {
@@ -108,6 +113,13 @@ func createGroup(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Invalid Method", 405)
 		return
 	}
+	r.ParseForm()
+	if r.FormValue("self") == "" {
+		http.Error(w, "Invalid Parameters", http.StatusBadRequest)
+	}
+	self = r.FormValue("self")
+	fmt.Println("Self is ", self)
+
 	var g Group
 	err := json.NewDecoder(r.Body).Decode(&g)
 	if err != nil {
@@ -115,7 +127,6 @@ func createGroup(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	self = g.Self
 	group = g.GroupID
 	if group == "" {
 		http.Error(w, "Invalid Form", http.StatusBadRequest)
@@ -146,8 +157,11 @@ func createGroup(w http.ResponseWriter, r *http.Request) {
 	}
 	fmt.Println("Updated user!")
 
+	var re Response
+	re.Message = "success"
+
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(g)
+	json.NewEncoder(w).Encode(re)
 }
 
 func joinGroup(w http.ResponseWriter, r *http.Request) {
