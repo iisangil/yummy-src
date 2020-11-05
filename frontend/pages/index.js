@@ -1,15 +1,10 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Head from 'next/head';
-import { useRouter } from 'next/router';
 import firebase from '../config/firebase';
-// import firebaseConfig from '../constants/firebaseConfig';
-// import * as firebase from 'firebase/app';
-// import 'firebase/auth';
 
 export default function Home() {
   const [user, setUser] = useState("");
-  const router = useRouter();
 
   useEffect(() => {
     // check if logged in

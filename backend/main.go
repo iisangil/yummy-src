@@ -33,9 +33,8 @@ type User struct {
 
 // Group is for groups in database
 type Group struct {
-	GroupID string `json:"groupid"`
-	Users   []User `json:"users"`
-	Self    string `json:"self"`
+	GroupID string   `json:"groupid"`
+	Users   []string `json:"users"`
 }
 
 func main() {
@@ -107,8 +106,69 @@ func login(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(re)
 }
 
+func updateUser() {
+	collection := client.Database("yummyDb").Collection("users")
+	_, err := collection.UpdateOne(
+		context.Background(),
+		bson.D{
+			primitive.E{Key: "userid", Value: self},
+		},
+		bson.D{
+			primitive.E{Key: "$set", Value: bson.D{
+				primitive.E{Key: "group", Value: group},
+			}},
+		},
+	)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println("Updated user!")
+}
+
 func createGroup(w http.ResponseWriter, r *http.Request) {
-	// implement this part
+	if r.Method != "POST" {
+		http.Error(w, "Invalid Method", 405)
+		return
+	}
+	r.ParseForm()
+	if r.FormValue("self") == "" {
+		http.Error(w, "Invalid Parameters", http.StatusBadRequest)
+	}
+	self = r.FormValue("self")
+	fmt.Println("Self is ", self)
+
+	var g Group
+	err := json.NewDecoder(r.Body).Decode(&g)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	fmt.Println(g)
+
+	group = g.GroupID
+	if group == "" {
+		http.Error(w, "Invalid Form", http.StatusBadRequest)
+		return
+	}
+
+	collection := client.Database("yummyDb").Collection("groups")
+	_, err = collection.InsertOne(context.Background(), g)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println("Inserted group!")
+
+	updateUser()
+
+	var re Response
+	re.Message = "success"
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(re)
+}
+
+func joinGroup(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		http.Error(w, "Invalid Method", 405)
 		return
@@ -134,56 +194,6 @@ func createGroup(w http.ResponseWriter, r *http.Request) {
 	}
 
 	collection := client.Database("yummyDb").Collection("groups")
-	_, err = collection.InsertOne(context.Background(), g)
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println("Inserted group!")
-
-	collection = client.Database("yummyDb").Collection("users")
-	_, err = collection.UpdateOne(
-		context.Background(),
-		bson.D{
-			primitive.E{Key: "userid", Value: self},
-		},
-		bson.D{
-			primitive.E{Key: "$set", Value: bson.D{
-				primitive.E{Key: "group", Value: group},
-			}},
-		},
-	)
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println("Updated user!")
-
-	var re Response
-	re.Message = "success"
-
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(re)
-}
-
-func joinGroup(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "POST" {
-		http.Error(w, "Invalid Method", 405)
-		return
-	}
-	var g Group
-	err := json.NewDecoder(r.Body).Decode(&g)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	self = g.Self
-	group = g.GroupID
-	if group == "" {
-		http.Error(w, "Invalid Form", http.StatusBadRequest)
-		return
-	}
-
-	collection := client.Database("yummyDb").Collection("groups")
 	_, err = collection.UpdateOne(
 		context.Background(),
 		bson.D{
@@ -191,40 +201,22 @@ func joinGroup(w http.ResponseWriter, r *http.Request) {
 		},
 		bson.D{
 			primitive.E{Key: "$push", Value: bson.D{
-				primitive.E{Key: "users", Value: bson.D{
-					primitive.E{Key: "userid", Value: self},
-					primitive.E{Key: "groupid", Value: group},
-				}},
+				primitive.E{Key: "users", Value: self},
 			}},
 		},
 	)
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println("after updating group self is", self)
 	fmt.Println("Updated group!")
 
-	collection = client.Database("yummyDb").Collection("users")
-	_, err = collection.UpdateOne(
-		context.Background(),
-		bson.D{
-			primitive.E{Key: "userid", Value: self},
-		},
-		bson.D{
-			primitive.E{Key: "$set", Value: bson.D{
-				primitive.E{Key: "group", Value: group},
-			}},
-		},
-	)
-	if err != nil {
-		log.Fatal(err)
-	}
-	fmt.Println("Updated user!")
+	updateUser()
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(g)
 }
 
+/**
 func leaveGroup(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
 		http.Error(w, "Invalid Method", 405)
@@ -283,3 +275,4 @@ func leaveGroup(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(g)
 }
+**/
