@@ -4,6 +4,7 @@ import (
 	"github.com/naguigui/yelp-fusion/yelp"
 )
 
-func GetRestaurants(endpoint string, client *yelp.Client) {
+// GetRestaurants function used to connect to yelp fusion api
+func GetRestaurants(client *yelp.Client, params map[string]string, delivery bool) {
 
 }

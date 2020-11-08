@@ -304,23 +304,23 @@ func getRestaurants(w http.ResponseWriter, r *http.Request) {
 	if r.FormValue("delivery") != "" {
 		delivery = true
 	}
-	location := "715 Church St #4 Ann Arbor, MI 48104"
 	if r.FormValue("location") == "" {
 		http.Error(w, "Invalid Parameters", http.StatusBadRequest)
 	}
+	location := "715 Church St #4 Ann Arbor, MI 48104"
 	// location := r.FormValue("location")
 	radius := "10"
 	if r.FormValue("radius") != "" {
 		radius = int(r.FormValue("radius"))
 	}
-	limit := 10
 	price := ""
 	if r.FormValue("price") != "" {
 		price := int(r.FormValue("price"))
 	}
-	var params map[string]string {
+	params := make(map[string]string)
+	params["location"] = location
+	params["radius"] = radius
+	params["price"] = price
 
-	}
-
-	endpoint.GetRestaurants(params)
+	endpoint.GetRestaurants(yelpClient, params, delivery)
 }
