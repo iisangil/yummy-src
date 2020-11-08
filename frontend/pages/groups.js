@@ -103,6 +103,11 @@ export default function Groups() {
             </div>
             }
             <Link href='/'><input type='submit' value='Back'></input></Link>
+            {group !== "" &&
+            <div>
+                Restaurants go here!
+            </div>
+            }
         </div>
     )
 }
