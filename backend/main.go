@@ -3,9 +3,12 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"endpoint"
 	"fmt"
 	"log"
+	"main/endpoint"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/rs/cors"
@@ -14,9 +17,12 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
+
+	"github.com/naguigui/yelp-fusion/yelp"
 )
 
 var client *mongo.Client
+var yelpClient *yelp.Client
 var self string
 var group string
 
@@ -66,6 +72,8 @@ func main() {
 	mux.HandleFunc("/login", login)
 	mux.HandleFunc("/create", createGroup)
 	mux.HandleFunc("/join", joinGroup)
+	// mux.HandleFunc("/leave", leaveGroup)
+	mux.HandleFunc("/get", getRestaurants)
 
 	handler := cors.Default().Handler(mux)
 	log.Fatal(http.ListenAndServe(":8080", handler))
@@ -276,3 +284,43 @@ func leaveGroup(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(g)
 }
 **/
+
+func getRestaurants(w http.ResponseWriter, r *http.Request) {
+	if r.Method != "POST" {
+		http.Error(w, "Invalid Method", 405)
+		return
+	}
+	if yelpClient == nil {
+		var err error
+		yelpClient, err = yelp.Init(&yelp.ClientOptions{APIKey: os.Getenv("YELP_API_KEY")})
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+	// params := r.URL.RawQuery
+	r.ParseForm()
+
+	delivery := false
+	if r.FormValue("delivery") != "" {
+		delivery = true
+	}
+	location := "715 Church St #4 Ann Arbor, MI 48104"
+	if r.FormValue("location") == "" {
+		http.Error(w, "Invalid Parameters", http.StatusBadRequest)
+	}
+	// location := r.FormValue("location")
+	radius := "10"
+	if r.FormValue("radius") != "" {
+		radius = int(r.FormValue("radius"))
+	}
+	limit := 10
+	price := ""
+	if r.FormValue("price") != "" {
+		price := int(r.FormValue("price"))
+	}
+	var params map[string]string {
+
+	}
+
+	endpoint.GetRestaurants(params)
+}
