@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"encoding/json"
-	"endpoint"
 	"fmt"
 	"log"
 	"main/endpoint"
@@ -297,9 +296,7 @@ func getRestaurants(w http.ResponseWriter, r *http.Request) {
 			log.Fatal(err)
 		}
 	}
-	// params := r.URL.RawQuery
 	r.ParseForm()
-
 	delivery := false
 	if r.FormValue("delivery") != "" {
 		delivery = true
@@ -311,11 +308,11 @@ func getRestaurants(w http.ResponseWriter, r *http.Request) {
 	// location := r.FormValue("location")
 	radius := "10"
 	if r.FormValue("radius") != "" {
-		radius = int(r.FormValue("radius"))
+		radius = r.FormValue("radius")
 	}
 	price := ""
 	if r.FormValue("price") != "" {
-		price := int(r.FormValue("price"))
+		price = r.FormValue("price")
 	}
 	params := make(map[string]string)
 	params["location"] = location
