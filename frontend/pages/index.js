@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Head from 'next/head';
-import { useRouter } from 'next/router';
+import Router from 'next/router';
 import { nanoid } from 'nanoid';
 import firebase from '../config/firebase';
 import { useForm } from 'react-hook-form';
@@ -9,15 +9,17 @@ import { useForm } from 'react-hook-form';
 const axios = require('axios').default
 
 export default function Groups() {
+    const [user, setUser] = useState('');
     const [group, setGroup] = useState('');
-    const router = useRouter();
-    const { self } = router.query;
 
     useEffect(() => {
         // check if logged in
-        firebase.auth().onAuthStateChanged((res) => {
-            if (!res) {
-                router.push('/signin');
+        firebase.auth().onAuthStateChanged((user) => {
+            console.log(user);
+            if (user) {
+                setUser(user);
+            } else {
+                Router.push("/signin")
             }
         });
         console.log("i need to check if user is in a group already");
@@ -124,6 +126,9 @@ export default function Groups() {
                 Restaurants go here!
             </div>
             }
+            <form onSubmit={signOut}>
+                <input type='submit' value='Sign Out' />
+            </form>
         </div>
     )
 }

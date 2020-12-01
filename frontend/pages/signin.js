@@ -26,13 +26,6 @@ class SignIn extends React.Component {
 
     componentDidMount() {
         // check if logged in already
-        firebase.auth().onAuthStateChanged((res) => {
-            if (res) {
-                Router.push("/");
-            }
-        });
-        firebase.auth().useDeviceLanguage();
-
         window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('sign-in-button', {
             'size': 'invisible',
             'callback': (response) => {
@@ -41,19 +34,10 @@ class SignIn extends React.Component {
         });
 
         firebase.auth().onAuthStateChanged((user) => {
+            console.log(user);
             if (user) {
-                this.setState({
-                    loggedIn: true,
-                });
-                Router.push("/");
-                
-                user.providerData.forEach((profile) => {
-                    console.log(profile);
-                    if (profile.providerId === "phone") {
-                        this.setState({
-                            user: profile.uid.substring(2,),
-                        });
-                    }
+                Router.push({
+                    pathname: "/",
                 });
             }
         })
