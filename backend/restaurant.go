@@ -17,7 +17,7 @@ type Coordinates struct {
 
 // Location object
 type Location struct {
-	Address1       string   `json:"addreses1"`
+	Address1       string   `json:"address1"`
 	Address2       string   `json:"address2"`
 	Address3       string   `json:"address3"`
 	City           string   `json:"city"`
