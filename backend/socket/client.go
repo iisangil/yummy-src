@@ -1,4 +1,4 @@
-package main
+package socket
 
 import "github.com/gorilla/websocket"
 
@@ -6,17 +6,17 @@ import "github.com/gorilla/websocket"
 type Client struct {
 	id      int
 	ws      *websocket.Conn
-	channel chan Message
+	channel chan MessageSent
 }
 
 func makeClient(id int, ws *websocket.Conn) *Client {
 	client := new(Client)
 	client.id = id
 	client.ws = ws
-	client.channel = make(chan Message)
+	client.channel = make(chan MessageSent)
 	return client
 }
 
-func (c *Client) sendMessage(msg Message) {
+func (c *Client) sendMessage(msg MessageSent) {
 	c.channel <- msg
 }

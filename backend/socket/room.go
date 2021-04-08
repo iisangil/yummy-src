@@ -1,4 +1,4 @@
-package main
+package socket
 
 import (
 	"log"
@@ -56,7 +56,7 @@ func (r *Room) handleMessages(id int) {
 		for _, client := range r.clients {
 			err := client.ws.WriteJSON(msg)
 			if err != nil {
-				log.Println(err)
+				log.Println("Error while sending to websocket: %v", err)
 			}
 		}
 		r.lock.Unlock()

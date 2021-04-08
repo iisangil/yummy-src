@@ -1,7 +1,6 @@
-package main
+package restaurant
 
-// add functions and structs and whatnot related to restaurants here
-// yelp api
+// yelp fusion api struct objects
 
 // Cattegory object
 type Category struct {
@@ -35,9 +34,9 @@ type Business struct {
 	Distance     float64     `json:"distance"`      // in meters
 	ID           string      `json:"id"`            // yelp id
 	Alias        string      `json:"alias"`         // yelp alias
-	ImageURL     string      `json"image_url"`
+	ImageURL     string      `json:"image_url"`
 	IsClosed     bool        `json:"is_closed"` // whether business has been permanently closed
-	Location     []Location  `json:"location"`
+	Location     Location    `json:"location"`
 	Name         string      `json:"name"`
 	Phone        string      `json:"phone"`
 	Price        string      `json:"price"`  // Price level of the business. Value is one of $, $$, $$$ and $$$$.

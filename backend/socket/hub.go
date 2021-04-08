@@ -1,12 +1,14 @@
-package main
+package socket
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"sync"
 
 	"github.com/gorilla/mux"
 	"github.com/gorilla/websocket"
+	"github.com/iisangil/yummy/tree/main/backend/restaurant"
 )
 
 // Hub to take care of all rooms and sockets
@@ -16,8 +18,8 @@ type Hub struct {
 	lock     sync.Mutex
 }
 
-// constructor for hub
-func makeHub() *Hub {
+// MakeHub constructor for hub
+func MakeHub() *Hub {
 	hub := new(Hub)
 	hub.rooms = make(map[string]*Room)
 	hub.upgrader.CheckOrigin = func(*http.Request) bool { return true } // allow requests from wherever
@@ -34,14 +36,15 @@ func (h *Hub) checkRoom(name string) *Room {
 	return h.rooms[name]
 }
 
-func (h *Hub) handleWebSockets(w http.ResponseWriter, r *http.Request) {
+// HandleWebSockets for hub
+func (h *Hub) HandleWebSockets(w http.ResponseWriter, r *http.Request) {
 	path := mux.Vars(r)
 	roomName := path["room"]
 	// log.Println(roomName)
 
 	ws, err := h.upgrader.Upgrade(w, r, nil) // upgrade http request to web socket
 	if err != nil {
-		log.Fatal("Upgrade: ", err)
+		log.Panic("Error while upgrading request to socket:", err)
 	}
 
 	defer ws.Close()
@@ -53,17 +56,24 @@ func (h *Hub) handleWebSockets(w http.ResponseWriter, r *http.Request) {
 	go room.handleMessages(id)
 
 	for {
-		var msg Message
+		var msg MessageReceived
+		msg.Parameters = make(map[string]string)
 
 		err := ws.ReadJSON(&msg)
 		if err != nil {
-			// log.Println("error ReadJSON: %v", err)
+			log.Println("error ReadJSON: %v", err)
 			// log.Println(id)
 			room.leaveRoom(id)
 			break
 		}
-		// log.Println(msg)
+		log.Println(fmt.Sprintf("%+v", msg))
 
-		client.sendMessage(msg)
+		if msg.Type == "message" {
+			sendMsg := MessageSent{Username: msg.Username, Message: msg.Message}
+			client.sendMessage(sendMsg)
+		} else if msg.Type == "get" {
+			restaurants := restaurant.GetRestaurants(msg.Parameters)
+			log.Println("RESTAURANTS", restaurants)
+		}
 	}
 }

@@ -6,19 +6,19 @@ import (
 	"time"
 
 	"github.com/gorilla/mux"
+	"github.com/iisangil/yummy/tree/main/backend/socket"
+	"github.com/joho/godotenv"
 )
 
-// Message struct to hold message information
-type Message struct {
-	Username string `json:"username"`
-	Message  string `json:"message"`
-	Channel  string `json:"channel"`
-}
-
 func main() {
-	hub := makeHub()
+	err := godotenv.Load(".env.test")
+	if err != nil {
+		log.Panic("Error loading .env file:", err)
+	}
+
+	hub := socket.MakeHub()
 	r := mux.NewRouter()
-	r.HandleFunc("/ws/{room}", hub.handleWebSockets)
+	r.HandleFunc("/ws/{room}", hub.HandleWebSockets)
 
 	srv := &http.Server{
 		Handler: r,
