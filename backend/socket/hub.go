@@ -68,12 +68,18 @@ func (h *Hub) HandleWebSockets(w http.ResponseWriter, r *http.Request) {
 		}
 		log.Println(fmt.Sprintf("%+v", msg))
 
-		if msg.Type == "message" {
-			sendMsg := MessageSent{Username: msg.Username, Message: msg.Message}
+		if msg.Type == "get" {
+			var restaurants []restaurant.Business
+			if !room.checkBusinesses() {
+				restaurants = restaurant.GetRestaurants(msg.Parameters)
+				room.setBusinesses(restaurants)
+			} else {
+				restaurants = room.getBusinesses()
+			}
+			sendMsg := MessageSent{Username: msg.Username, Type: msg.Type, Restaurants: restaurants}
 			client.sendMessage(sendMsg)
-		} else if msg.Type == "get" {
-			restaurants := restaurant.GetRestaurants(msg.Parameters)
-			log.Println("RESTAURANTS", restaurants)
+		} else if msg.Type == "like" {
+			// add stuff
 		}
 	}
 }

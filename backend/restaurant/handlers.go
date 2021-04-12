@@ -2,7 +2,6 @@ package restaurant
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -41,8 +40,6 @@ func GetRestaurants(parameters map[string]string) []Business {
 		log.Panic("error unmarshalling response body:", err)
 	}
 
-	log.Println(fmt.Sprintf("RESPONSE: %+v", yelpResponse))
-
-	thing := make([]Business, 0)
-	return thing
+	businesses := yelpResponse.Businesses
+	return businesses
 }
