@@ -18,7 +18,7 @@ func main() {
 
 	hub := socket.MakeHub()
 	r := mux.NewRouter()
-	r.HandleFunc("/ws/{room}", hub.HandleWebSockets)
+	r.HandleFunc("/ws/{username}/{room}", hub.HandleWebSockets)
 
 	srv := &http.Server{
 		Handler: r,

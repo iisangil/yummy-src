@@ -46,7 +46,7 @@ func (h *Hub) deleteRoom(name string) {
 func (h *Hub) HandleWebSockets(w http.ResponseWriter, r *http.Request) {
 	path := mux.Vars(r)
 	roomName := path["room"]
-	// log.Println(roomName)
+	username := path["username"]
 
 	ws, err := h.upgrader.Upgrade(w, r, nil) // upgrade http request to web socket
 	if err != nil {
@@ -56,15 +56,19 @@ func (h *Hub) HandleWebSockets(w http.ResponseWriter, r *http.Request) {
 	defer ws.Close()
 
 	room := h.checkRoom(roomName)
-	id := room.joinRoom(ws)
+	id := room.joinRoom(ws, username)
 	if id == -1 {
-		sendMsg := MessageSent{Username: "", Type: "err"}
+		sendMsg := MessageSent{Username: username, Type: "err"}
 		ws.WriteJSON(sendMsg)
 		return
 	}
-	client := room.getClient(id)
 
 	go room.handleMessages(id)
+
+	client := room.getClient(id)
+	users := room.getUsers()
+	userMsg := MessageSent{Username: client.username, Type: "users", Users: users}
+	client.sendMessage(userMsg)
 
 	for {
 		var msg MessageReceived
@@ -73,10 +77,8 @@ func (h *Hub) HandleWebSockets(w http.ResponseWriter, r *http.Request) {
 		err := ws.ReadJSON(&msg)
 		if err != nil {
 			log.Println("error ReadJSON", err)
-			log.Println(id)
 			numClients := room.leaveRoom(id)
 			if numClients == 0 {
-				log.Println("room is empty")
 				h.deleteRoom(roomName)
 			}
 			break

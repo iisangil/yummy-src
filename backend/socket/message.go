@@ -14,5 +14,6 @@ type MessageSent struct {
 	Username    string                `json:"username"`
 	Type        string                `json:"type"`
 	Message     string                `json:"message,omitempty"`
+	Users       []string              `json:"users,omitempty"`
 	Restaurants []restaurant.Business `json:"restaurants,omitempty"`
 }

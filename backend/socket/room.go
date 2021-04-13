@@ -32,14 +32,14 @@ func makeRoom(name string) *Room {
 	return room
 }
 
-func (r *Room) joinRoom(ws *websocket.Conn) int {
+func (r *Room) joinRoom(ws *websocket.Conn, username string) int {
 	r.lock.Lock()
 	defer r.lock.Unlock()
 	if r.status != "waiting" {
 		return -1
 	}
 	r.index++
-	client := makeClient(r.index, ws)
+	client := makeClient(r.index, ws, username)
 	r.clients[r.index] = client
 	return r.index
 }
@@ -59,6 +59,16 @@ func (r *Room) setStatus(status string) {
 
 func (r *Room) getClient(id int) *Client {
 	return r.clients[id]
+}
+
+func (r *Room) getUsers() []string {
+	r.lock.Lock()
+	users := make([]string, 0)
+	for _, v := range r.clients {
+		users = append(users, v.username)
+	}
+	r.lock.Unlock()
+	return users
 }
 
 func (r *Room) numClients() int {
