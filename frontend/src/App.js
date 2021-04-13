@@ -2,9 +2,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import './App.css';
 
 function App() {
-  const [status, setStatus] = useState(false);
+  const [login, setLogin] = useState(false);
   const [username, setUsername] = useState("");
-  const [room, setRoom] = useState("global")
+  const [room, setRoom] = useState("")
   const [messages, setMessages] = useState([]);
   const ws = useRef(null);
   const [text, setText] = useState("");
@@ -24,16 +24,21 @@ function App() {
   const handleLogin = (e) => {
     e.preventDefault();
     const username = e.target.username.value;
-    const roomName = e.target.roomName.value;
 
     if (username !== "") {
       setUsername(username);
-      if (roomName !== "") {
-        setRoom(roomName);
-      }
-      setStatus(prevStatus => !prevStatus);
+      setLogin(prevLogin => !prevLogin);
+    }
+  }
 
-      ws.current = new WebSocket("ws://localhost:8000/ws/"+room);
+  const handleRoom = (e) => {
+    e.preventDefault();
+    const roomName = e.target.roomName.value;
+
+    if (roomName !== "") {
+      setRoom(roomName);
+
+      ws.current = new WebSocket("ws://localhost:8000/ws/"+username+"/"+room);
     }
   }
 
@@ -41,7 +46,8 @@ function App() {
     e.preventDefault();
     const message = e.target.message.value;
     if (message !== "") {
-      const toSend = {"username": username, "type": "get", "parameters": {}, "message": message};
+      const toSend = {"username": username, "type": "start", "parameters": {}};
+      console.log(toSend);
       ws.current.send(JSON.stringify(toSend));
     }
     setText("");
@@ -59,10 +65,7 @@ function App() {
     ws.current.close();
     ws.current = null;
     
-    setStatus(prevStatus => !prevStatus);
-    setUsername("");
-    setRoom("global");
-    setMessages([]);
+    setRoom("");
   }
 
   return (
@@ -70,12 +73,32 @@ function App() {
       <header>
         <nav>
           <div>
-            <p>Simple Chat</p>
+            <p>Yummy</p>
           </div>
         </nav>
       </header>
       <main>
         <div>
+          {!login &&
+          <form onSubmit={handleLogin}>
+            <input type='text' name='username' placeholder='enter username' autoComplete='off' />
+            <input type='submit' value='enter' />
+          </form>
+          }
+          {login && room == "" &&
+          <div>
+            <p>
+              Username: {username}
+            </p>
+            <form onSubmit={handleRoom}>
+              <input type='text' name='roomName' placeholder='enter room name' autoComplete='off' />
+              <input type='submit' value='enter' />
+            </form>
+          </div>
+          }
+
+
+{/* 
           {status &&
           <div>
             <p>
@@ -89,7 +112,7 @@ function App() {
               return (
               <ul>
                   <p id="username">{message.username}</p>
-                  <li id="message">{message.message}</li>
+                  <li id="message">{message.type}</li>
               </ul>
               )
             })
@@ -103,14 +126,7 @@ function App() {
               <input type='submit' value='Leave room' />
             </form>
           </div>
-          }
-          {!status &&
-          <form onSubmit={handleLogin}>
-            <input type='text' name='username' placeholder='enter username' autoComplete='off' />
-            <input type='text' name='roomName' placeholder='enter room name' autoComplete='off' />
-            <input type='submit' value='enter' />
-          </form>
-          }
+          } */}
         </div>
       </main>
     </body>
