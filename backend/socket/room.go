@@ -16,6 +16,7 @@ type Room struct {
 	lock       sync.Mutex
 	businesses []restaurant.Business
 	matches    map[string][]int
+	status     string
 }
 
 // constructor for channels
@@ -26,30 +27,44 @@ func makeRoom(name string) *Room {
 	room.index = 0
 	room.businesses = nil
 	room.matches = make(map[string][]int)
+	room.status = "waiting"
 
 	return room
 }
 
 func (r *Room) joinRoom(ws *websocket.Conn) int {
 	r.lock.Lock()
+	defer r.lock.Unlock()
+	if r.status != "waiting" {
+		return -1
+	}
 	r.index++
 	client := makeClient(r.index, ws)
 	r.clients[r.index] = client
-	r.lock.Unlock()
 	return r.index
 }
 
-func (r *Room) leaveRoom(id int) {
+func (r *Room) leaveRoom(id int) int {
 	r.lock.Lock()
+	defer r.lock.Unlock()
 	delete(r.clients, id)
-	if len(r.clients) == 0 {
-		r.businesses = nil
-	}
+	return len(r.clients)
+}
+
+func (r *Room) setStatus(status string) {
+	r.lock.Lock()
+	r.status = status
 	r.lock.Unlock()
 }
 
 func (r *Room) getClient(id int) *Client {
 	return r.clients[id]
+}
+
+func (r *Room) numClients() int {
+	r.lock.Lock()
+	defer r.lock.Unlock()
+	return len(r.clients)
 }
 
 func (r *Room) handleMessages(id int) {
@@ -64,10 +79,23 @@ func (r *Room) handleMessages(id int) {
 		for _, client := range r.clients {
 			err := client.ws.WriteJSON(msg)
 			if err != nil {
-				log.Println("Error while sending to websocket: %v", err)
+				log.Println("Error while sending to websocket", err)
 			}
 		}
 		r.lock.Unlock()
+	}
+}
+
+func (r *Room) sendMessages(ids []int, message MessageSent) {
+	for _, v := range ids {
+		r.lock.Lock()
+		self := r.clients[v]
+		r.lock.Unlock()
+
+		err := self.ws.WriteJSON(message)
+		if err != nil {
+			log.Println("Error sending message", err)
+		}
 	}
 }
 
@@ -90,4 +118,11 @@ func (r *Room) getBusinesses() []restaurant.Business {
 	r.lock.Lock()
 	defer r.lock.Unlock()
 	return r.businesses
+}
+
+func (r *Room) likeBusiness(clientID int, businessID string) (int, []int) {
+	r.lock.Lock()
+	defer r.lock.Unlock()
+	r.matches[businessID] = append(r.matches[businessID], clientID)
+	return len(r.matches[businessID]), r.matches[businessID]
 }

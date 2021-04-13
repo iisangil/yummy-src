@@ -7,7 +7,6 @@ type MessageReceived struct {
 	Username   string            `json:"username"`
 	Type       string            `json:"type"`
 	Parameters map[string]string `json:"parameters,omitempty"`
-	Message    string            `json:"message,omitempty"`
 }
 
 // MessageSent struct to hold message information to send back

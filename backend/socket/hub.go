@@ -36,6 +36,12 @@ func (h *Hub) checkRoom(name string) *Room {
 	return h.rooms[name]
 }
 
+func (h *Hub) deleteRoom(name string) {
+	h.lock.Lock()
+	delete(h.rooms, name)
+	h.lock.Unlock()
+}
+
 // HandleWebSockets for hub
 func (h *Hub) HandleWebSockets(w http.ResponseWriter, r *http.Request) {
 	path := mux.Vars(r)
@@ -51,6 +57,11 @@ func (h *Hub) HandleWebSockets(w http.ResponseWriter, r *http.Request) {
 
 	room := h.checkRoom(roomName)
 	id := room.joinRoom(ws)
+	if id == -1 {
+		sendMsg := MessageSent{Username: "", Type: "err"}
+		ws.WriteJSON(sendMsg)
+		return
+	}
 	client := room.getClient(id)
 
 	go room.handleMessages(id)
@@ -61,25 +72,35 @@ func (h *Hub) HandleWebSockets(w http.ResponseWriter, r *http.Request) {
 
 		err := ws.ReadJSON(&msg)
 		if err != nil {
-			log.Println("error ReadJSON: %v", err)
-			// log.Println(id)
-			room.leaveRoom(id)
+			log.Println("error ReadJSON", err)
+			log.Println(id)
+			numClients := room.leaveRoom(id)
+			if numClients == 0 {
+				log.Println("room is empty")
+				h.deleteRoom(roomName)
+			}
 			break
 		}
 		log.Println(fmt.Sprintf("%+v", msg))
 
-		if msg.Type == "get" {
-			var restaurants []restaurant.Business
-			if !room.checkBusinesses() {
-				restaurants = restaurant.GetRestaurants(msg.Parameters)
-				room.setBusinesses(restaurants)
-			} else {
-				restaurants = room.getBusinesses()
-			}
+		if msg.Type == "start" {
+			room.setStatus("started")
+
+			restaurants := room.getBusinesses()
 			sendMsg := MessageSent{Username: msg.Username, Type: msg.Type, Restaurants: restaurants}
 			client.sendMessage(sendMsg)
+		} else if msg.Type == "get" {
+			restaurants := restaurant.GetRestaurants(msg.Parameters)
+			room.setBusinesses(restaurants)
 		} else if msg.Type == "like" {
-			// add stuff
+			numLikes, likeClients := room.likeBusiness(id, msg.Parameters["businessID"])
+			if numLikes == room.numClients() {
+				sendMsg := MessageSent{Username: msg.Username, Type: "match", Message: msg.Parameters["businessID"]}
+				client.sendMessage(sendMsg)
+			} else if numLikes > 0 {
+				sendMsg := MessageSent{Username: msg.Username, Type: "like", Message: msg.Parameters["businessID"]}
+				room.sendMessages(likeClients, sendMsg)
+			}
 		}
 	}
 }
