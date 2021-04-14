@@ -28,7 +28,6 @@ func GetRestaurants(parameters map[string]string) []Business {
 	}
 	query.Set("radius", strconv.Itoa(radius*1609))
 
-	query.Set("radius", parameters["radius"])
 	query.Set("limit", "50")
 	query.Set("open_now", "true")
 
