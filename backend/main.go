@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/gorilla/mux"
@@ -20,9 +21,14 @@ func main() {
 	r := mux.NewRouter()
 	r.HandleFunc("/ws/{username}/{room}", hub.HandleWebSockets)
 
+	port, exists := os.LookupEnv("PORT")
+	if exists == false {
+		port = "8000"
+	}
+
 	srv := &http.Server{
 		Handler: r,
-		Addr:    "127.0.0.1:8000",
+		Addr:    ":" + port,
 		// Good practice: enforce timeouts for servers you create!
 		WriteTimeout: 15 * time.Second,
 		ReadTimeout:  15 * time.Second,
