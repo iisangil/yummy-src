@@ -80,6 +80,10 @@ func (h *Hub) HandleWebSockets(w http.ResponseWriter, r *http.Request) {
 			numClients := room.leaveRoom(id)
 			if numClients == 0 {
 				h.deleteRoom(roomName)
+			} else {
+				users = room.getUsers()
+				userMsg = MessageSent{Username: client.username, Type: "users", Users: users}
+				client.sendMessage(userMsg)
 			}
 			break
 		}
@@ -92,8 +96,10 @@ func (h *Hub) HandleWebSockets(w http.ResponseWriter, r *http.Request) {
 			sendMsg := MessageSent{Username: msg.Username, Type: msg.Type, Restaurants: restaurants}
 			client.sendMessage(sendMsg)
 		} else if msg.Type == "get" {
-			restaurants := restaurant.GetRestaurants(msg.Parameters)
-			room.setBusinesses(restaurants)
+			if !room.checkBusinesses() {
+				restaurants := restaurant.GetRestaurants(msg.Parameters)
+				room.setBusinesses(restaurants)
+			}
 		} else if msg.Type == "like" {
 			numLikes, likeClients := room.likeBusiness(id, msg.Parameters["businessID"])
 			if numLikes == room.numClients() {

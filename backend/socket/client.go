@@ -1,8 +1,6 @@
 package socket
 
 import (
-	"log"
-
 	"github.com/gorilla/websocket"
 )
 
@@ -24,7 +22,5 @@ func makeClient(id int, ws *websocket.Conn, username string) *Client {
 }
 
 func (c *Client) sendMessage(msg MessageSent) {
-	log.Println("sending")
 	c.channel <- msg
-	log.Println("sent")
 }

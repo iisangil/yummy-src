@@ -18,8 +18,22 @@ func GetRestaurants(parameters map[string]string) []Business {
 	req.Header.Set("Authorization", "Bearer "+os.Getenv("API_TOKEN"))
 
 	query := req.URL.Query()
-	query.Set("latitude", "37.786882")
-	query.Set("longitude", "-122.399972")
+	query.Set("latitude", parameters["latitude"])
+	query.Set("longitude", parameters["longitude"])
+	query.Set("radius", parameters["radius"])
+	query.Set("limit", "50")
+	query.Set("open_now", "true")
+
+	switch parameters["price"] {
+	case "4":
+		query.Set("price", "1,2,3,4")
+	case "3":
+		query.Set("price", "1,2,3")
+	case "2":
+		query.Set("price", "1,2")
+	case "1":
+		query.Set("price", "1")
+	}
 
 	req.URL.RawQuery = query.Encode()
 
