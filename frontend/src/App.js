@@ -54,9 +54,6 @@ function App() {
           const alertMessage = "Your room has matched a restaurant! " + restaurants[index].name;
           alert(alertMessage);
           break;
-        case "test":
-          setRestaurants(restaurants => [...restaurants, ...message.restaurants]);
-          break;
         default:
           console.log("huh?");
           break;
