@@ -62,6 +62,5 @@ func GetRestaurants(parameters map[string]string) []Business {
 	}
 
 	businesses := yelpResponse.Businesses
-	log.Println(businesses)
 	return businesses
 }
