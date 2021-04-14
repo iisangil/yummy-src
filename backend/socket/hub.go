@@ -87,7 +87,7 @@ func (h *Hub) HandleWebSockets(w http.ResponseWriter, r *http.Request) {
 			}
 			break
 		}
-		log.Println(fmt.Sprintf("%+v", msg))
+		log.Println(fmt.Sprintf("msg: %+v", msg))
 
 		if msg.Type == "start" {
 			room.setStatus("started")
