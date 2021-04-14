@@ -1,23 +1,39 @@
 import React, { useState, useEffect, useRef } from 'react';
+import Modal from 'react-bootstrap/Modal'
+import Button from 'react-bootstrap/Button'
+import { useCurrentPosition } from 'react-use-geolocation';
 import './App.css';
+
+var rand = require("random-key");
 
 function App() {
   const [login, setLogin] = useState(false);
+  const [start, setStart] = useState(false);
+  const [show, setShow] = useState(false);
   const [username, setUsername] = useState("");
   const [room, setRoom] = useState("")
-  const [messages, setMessages] = useState([]);
+  const [users, setUsers] = useState([]);
+  const [restaurants, setRestaurants] = useState([]);
   const ws = useRef(null);
-  const [text, setText] = useState("");
+
+  const [radius, setRadius] = useState(10);
+  const [price, setPrice] = useState(2);
+
+  const [position, error] = useCurrentPosition();
 
   useEffect(() => {
     if (!ws.current) return;
 
     ws.current.onmessage = (e) => {
       const message = JSON.parse(e.data);
-
-      setMessages(messages.concat(message));
-
       console.log("e", message);
+
+      if (message.type === "users") {
+        setUsers(message.users);
+      } else if (message.type === "start") {
+        setRestaurants(message.restaurants);
+        setStart(true);
+      }
     };
   });
 
@@ -31,32 +47,48 @@ function App() {
     }
   }
 
-  const handleRoom = (e) => {
+  const createModal = (e) => {
+    e.preventDefault()
+
+    setShow(true);
+  }
+
+  const handleClose = () => {
+    setShow(false);
+  }
+
+  const createRoom = (e) => {
+    e.preventDefault();
+    console.log("create room");
+
+    setShow(false);
+
+    const roomName = rand.generate(8);
+    setRoom(roomName);
+    ws.current = new WebSocket("ws:/localhost:8000/ws/"+username+"/"+roomName);
+
+    const toSend = {
+      "username": username,
+      "type": "get",
+      parameters: { 
+        "radius": radius.toString(),
+        "price": price.toString(),
+        "latitude": position.coords.latitude.toString(),
+        "longitude": position.coords.longitude.toString(),
+      }
+    };
+    ws.current.onopen = () => ws.current.send(JSON.stringify(toSend));
+  }
+
+  const joinRoom = (e) => {
     e.preventDefault();
     const roomName = e.target.roomName.value;
 
     if (roomName !== "") {
       setRoom(roomName);
 
-      ws.current = new WebSocket("ws://localhost:8000/ws/"+username+"/"+room);
+      ws.current = new WebSocket("ws://localhost:8000/ws/"+username+"/"+roomName);
     }
-  }
-
-  const handleMessages = (e) => {
-    e.preventDefault();
-    const message = e.target.message.value;
-    if (message !== "") {
-      const toSend = {"username": username, "type": "start", "parameters": {}};
-      console.log(toSend);
-      ws.current.send(JSON.stringify(toSend));
-    }
-    setText("");
-  }
-
-  const handleText = (e) => {
-    e.preventDefault();
-    const { value } = e.target;
-    setText(value);
   }
 
   const leaveRoom = (e) => {
@@ -66,6 +98,36 @@ function App() {
     ws.current = null;
     
     setRoom("");
+    setRadius(20);
+    setPrice(4);
+  }
+
+  const startRoom = (e) => {
+    e.preventDefault();
+
+    setStart(true);
+
+    const toSend = {"username": username, "type": "start"}
+    ws.current.send(JSON.stringify(toSend));
+  }
+
+  const handleRadius = (e) => {
+    e.preventDefault();
+
+    setRadius(e.target.value);
+  }
+
+  const handlePrice = (e) => {
+    e.preventDefault();
+
+    setPrice(e.target.value);
+  }
+
+  if (!position && !error) {
+    return <p>Waiting for location...</p>;
+  }
+  if (error) {
+    return <p>Yummy needs your location to be used. Please allow location services.</p>;
   }
 
   return (
@@ -85,48 +147,70 @@ function App() {
             <input type='submit' value='enter' />
           </form>
           }
-          {login && room == "" &&
+          {login && room === "" && !start &&
           <div>
             <p>
               Username: {username}
             </p>
-            <form onSubmit={handleRoom}>
+            <form onSubmit={createModal}>
+              <input type='submit' value='create new room' />
+            </form>
+
+            <Modal show={show} onHide={handleClose}>
+              <Modal.Header closeButton></Modal.Header>
+              <Modal.Body>
+                <form>
+                  <input type='range' name='radius' min='1' max='20' step='1' value={radius} onChange={handleRadius} />
+                  <label for='radius'>search radius: {radius}</label>
+                </form>
+                <form>
+                  <input type='range' name='price' min='1' max='4' step='1' value={price} onChange={handlePrice} />
+                  <label for='price'>price range: {price}</label>
+                </form>
+              </Modal.Body>
+              <Modal.Footer>
+                <Button variant="primary" onClick={createRoom}>
+                  Create Room
+                </Button>
+              </Modal.Footer>
+            </Modal>
+            
+            <form onSubmit={joinRoom}>
               <input type='text' name='roomName' placeholder='enter room name' autoComplete='off' />
               <input type='submit' value='enter' />
             </form>
           </div>
           }
-
-
-{/* 
-          {status &&
-          <div>
-            <p>
-              Room: {room}
-            </p>
-            <p>
-              Username: {username}
-            </p>
-            <div >
-            {messages.map((message) => {
-              return (
-              <ul>
-                  <p id="username">{message.username}</p>
-                  <li id="message">{message.type}</li>
-              </ul>
-              )
-            })
-            }
+          {login && room !== "" && !start &&
+            <div>
+              <p>
+                Username: {username}
+              </p>
+              <p>
+                Room: {room}
+              </p>
+              <p>
+                Users:
+              </p>
+              {users.map((user) => {
+                return (
+                <ul key='{user}'>
+                    <li>{user}</li>
+                </ul>
+                )
+              })
+              }
+              <form onSubmit={startRoom}>
+                <input type='submit' value='start' />
+              </form>
+              <form onSubmit={leaveRoom}>
+                <input type='submit' value='leave room' />
+              </form>
             </div>
-            <form onSubmit={handleMessages}>
-              <input type='text' name='message' placeholder='enter message' value={text} onChange={handleText} autoComplete="off" />
-              <input type='submit' value='enter' />
-            </form>
-            <form onSubmit={leaveRoom}>
-              <input type='submit' value='Leave room' />
-            </form>
-          </div>
-          } */}
+          }
+          {start &&
+          <p> fuck the police </p>
+          }
         </div>
       </main>
     </body>
