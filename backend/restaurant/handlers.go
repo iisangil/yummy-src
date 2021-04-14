@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 )
 
 // GetRestaurants returns the restaurants
@@ -20,6 +21,13 @@ func GetRestaurants(parameters map[string]string) []Business {
 	query := req.URL.Query()
 	query.Set("latitude", parameters["latitude"])
 	query.Set("longitude", parameters["longitude"])
+
+	radius, err := strconv.Atoi(parameters["radius"])
+	if err != nil {
+		log.Panic("error while converting radius to integer", err)
+	}
+	query.Set("radius", strconv.Itoa(radius*1609))
+
 	query.Set("radius", parameters["radius"])
 	query.Set("limit", "50")
 	query.Set("open_now", "true")

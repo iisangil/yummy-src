@@ -92,14 +92,18 @@ func (h *Hub) HandleWebSockets(w http.ResponseWriter, r *http.Request) {
 		if msg.Type == "start" {
 			room.setStatus("started")
 
-			restaurants := room.getBusinesses()
-			sendMsg := MessageSent{Username: msg.Username, Type: msg.Type, Restaurants: restaurants}
+			sendMsg := MessageSent{Username: msg.Username, Type: msg.Type}
 			client.sendMessage(sendMsg)
 		} else if msg.Type == "get" {
+			var restaurants []restaurant.Business
 			if !room.checkBusinesses() {
-				restaurants := restaurant.GetRestaurants(msg.Parameters)
+				restaurants = restaurant.GetRestaurants(msg.Parameters)
 				room.setBusinesses(restaurants)
+			} else {
+				restaurants = room.getBusinesses()
 			}
+			sendMsg := MessageSent{Username: msg.Username, Type: msg.Type, Restaurants: restaurants}
+			room.sendMessages([]int{id}, sendMsg)
 		} else if msg.Type == "like" {
 			numLikes, likeClients := room.likeBusiness(id, msg.Parameters["businessID"])
 			if numLikes == room.numClients() {
