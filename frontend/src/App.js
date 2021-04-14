@@ -130,6 +130,7 @@ function App() {
     ws.current = null;
     
     setRoom("");
+    setRestaurants([]);
     setRadius(10);
     setPrice(2);
   }
