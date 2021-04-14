@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useCurrentPosition } from 'react-use-geolocation';
 import Modal from 'react-bootstrap/Modal'
 import Button from 'react-bootstrap/Button'
-import { useCurrentPosition } from 'react-use-geolocation';
+import TinderCard from 'react-tinder-card'
 import './App.css';
 
 var rand = require("random-key");
@@ -30,8 +31,9 @@ function App() {
 
       if (message.type === "users") {
         setUsers(message.users);
-      } else if (message.type === "start") {
+      } else if (message.type === "get") {
         setRestaurants(message.restaurants);
+      } else if (message.type === "start") {
         setStart(true);
       }
     };
@@ -59,7 +61,6 @@ function App() {
 
   const createRoom = (e) => {
     e.preventDefault();
-    console.log("create room");
 
     setShow(false);
 
@@ -77,6 +78,7 @@ function App() {
         "longitude": position.coords.longitude.toString(),
       }
     };
+    console.log(toSend);
     ws.current.onopen = () => ws.current.send(JSON.stringify(toSend));
   }
 
@@ -98,17 +100,17 @@ function App() {
     ws.current = null;
     
     setRoom("");
-    setRadius(20);
-    setPrice(4);
+    setRadius(10);
+    setPrice(2);
   }
 
   const startRoom = (e) => {
     e.preventDefault();
 
-    setStart(true);
-
     const toSend = {"username": username, "type": "start"}
     ws.current.send(JSON.stringify(toSend));
+
+    setStart(true);
   }
 
   const handleRadius = (e) => {
@@ -121,6 +123,10 @@ function App() {
     e.preventDefault();
 
     setPrice(e.target.value);
+  }
+
+  const onSwipe = (direction) => {
+    console.log('You swiped: ' + direction)
   }
 
   if (!position && !error) {
@@ -209,7 +215,17 @@ function App() {
             </div>
           }
           {start &&
-          <p> fuck the police </p>
+            <div>
+              {restaurants.map((restaurant) => {
+                return (
+                  <TinderCard key={restaurant.name} onSwipe={onSwipe} preventSwipe={['up', 'down']}>
+                    <div style={`background-image: url('${restaurant.image_url}');`}>
+                      <h3>{restaurant.name}</h3>
+                    </div>
+                  </TinderCard>
+                )
+              })}
+            </div>
           }
         </div>
       </main>
