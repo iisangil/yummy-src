@@ -40,7 +40,7 @@ function App() {
           setUsers(message.users);
           break;
         case "get":
-          setRestaurants(message.restaurants);
+          setRestaurants(restaurants => [...restaurants, ...message.restaurants]);
           break;
         case "start":
           setStart(true);
@@ -53,6 +53,9 @@ function App() {
           const index = parseInt(message.message);
           const alertMessage = "Your room has matched a restaurant! " + restaurants[index].name;
           alert(alertMessage);
+          break;
+        case "test":
+          setRestaurants(restaurants => [...restaurants, ...message.restaurants]);
           break;
         default:
           console.log("huh?");
@@ -256,11 +259,11 @@ function App() {
           {start &&
             <div className='cardContainer'>
               {restaurants.map((restaurant, index) => 
-                <TinderCard key={restaurant.name} className='swipe' onSwipe={(dir) => onSwipe(dir, index)} preventSwipe={['up', 'down']}>
+                <TinderCard key={restaurant.id} className='swipe' onSwipe={(dir) => onSwipe(dir, index)} preventSwipe={['up', 'down']}>
                   <div className='card' style={{ backgroundImage: `url('${restaurant.image_url}')`}}></div>
                   <h3 className='cardName'>{restaurant.name}</h3>
                 </TinderCard>
-              )}
+              ).reverse()}
             </div>
           }
         </div>
