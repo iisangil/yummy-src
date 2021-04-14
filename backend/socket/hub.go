@@ -105,12 +105,12 @@ func (h *Hub) HandleWebSockets(w http.ResponseWriter, r *http.Request) {
 			sendMsg := MessageSent{Username: msg.Username, Type: msg.Type, Restaurants: restaurants}
 			room.sendMessages([]int{id}, sendMsg)
 		} else if msg.Type == "like" {
-			numLikes, likeClients := room.likeBusiness(id, msg.Parameters["businessID"])
+			numLikes, likeClients := room.likeBusiness(id, msg.Parameters["index"])
 			if numLikes == room.numClients() {
-				sendMsg := MessageSent{Username: msg.Username, Type: "match", Message: msg.Parameters["businessID"]}
+				sendMsg := MessageSent{Username: msg.Username, Type: "match", Message: msg.Parameters["index"]}
 				client.sendMessage(sendMsg)
 			} else if numLikes > 0 {
-				sendMsg := MessageSent{Username: msg.Username, Type: "like", Message: msg.Parameters["businessID"]}
+				sendMsg := MessageSent{Username: msg.Username, Type: "like", Message: msg.Parameters["index"]}
 				room.sendMessages(likeClients, sendMsg)
 			}
 		}

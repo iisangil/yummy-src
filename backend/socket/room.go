@@ -130,9 +130,9 @@ func (r *Room) getBusinesses() []restaurant.Business {
 	return r.businesses
 }
 
-func (r *Room) likeBusiness(clientID int, businessID string) (int, []int) {
+func (r *Room) likeBusiness(clientID int, index string) (int, []int) {
 	r.lock.Lock()
 	defer r.lock.Unlock()
-	r.matches[businessID] = append(r.matches[businessID], clientID)
-	return len(r.matches[businessID]), r.matches[businessID]
+	r.matches[index] = append(r.matches[index], clientID)
+	return len(r.matches[index]), r.matches[index]
 }
