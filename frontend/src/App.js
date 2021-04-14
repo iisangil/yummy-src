@@ -11,10 +11,16 @@ function App() {
   const [login, setLogin] = useState(false);
   const [start, setStart] = useState(false);
   const [show, setShow] = useState(false);
+
   const [username, setUsername] = useState("");
   const [room, setRoom] = useState("")
+
   const [users, setUsers] = useState([]);
   const [restaurants, setRestaurants] = useState([]);
+
+  const [likes, setLikes] = useState([]);
+  const [matches, setMatches] = useState([]);
+
   const ws = useRef(null);
 
   const [radius, setRadius] = useState(10);
@@ -29,12 +35,28 @@ function App() {
       const message = JSON.parse(e.data);
       console.log("e", message);
 
-      if (message.type === "users") {
-        setUsers(message.users);
-      } else if (message.type === "get") {
-        setRestaurants(message.restaurants);
-      } else if (message.type === "start") {
-        setStart(true);
+      switch (message.type) {
+        case "users":
+          setUsers(message.users);
+          break;
+        case "get":
+          setRestaurants(message.restaurants);
+          break;
+        case "start":
+          setStart(true);
+          break;
+        case "like":
+          setLikes(likes => [...likes, message.message]);
+          break;
+        case "match":
+          setMatches(matches => [...matches, message.message]);
+          const index = parseInt(message.message);
+          const alertMessage = "Your room has matched a restaurant! " + restaurants[index].name;
+          alert(alertMessage);
+          break;
+        default:
+          console.log("huh?");
+          break;
       }
     };
   });
@@ -78,7 +100,7 @@ function App() {
         "longitude": position.coords.longitude.toString(),
       }
     };
-    console.log(toSend);
+    console.log("s", toSend);
     ws.current.onopen = () => ws.current.send(JSON.stringify(toSend));
   }
 
@@ -90,6 +112,14 @@ function App() {
       setRoom(roomName);
 
       ws.current = new WebSocket("ws://localhost:8000/ws/"+username+"/"+roomName);
+
+      const toSend = {
+        "username": username,
+        "type": "get",
+      };
+      console.log("s", toSend);
+
+      ws.current.onopen = () => ws.current.send(JSON.stringify(toSend));
     }
   }
 
@@ -108,9 +138,9 @@ function App() {
     e.preventDefault();
 
     const toSend = {"username": username, "type": "start"}
-    ws.current.send(JSON.stringify(toSend));
+    console.log("s", toSend);
 
-    setStart(true);
+    ws.current.send(JSON.stringify(toSend));
   }
 
   const handleRadius = (e) => {
@@ -125,8 +155,20 @@ function App() {
     setPrice(e.target.value);
   }
 
-  const onSwipe = (direction) => {
-    console.log('You swiped: ' + direction)
+  const onSwipe = (direction, index) => {
+    console.log("you swiped", direction, "on", restaurants[parseInt(index)].name);
+    if (direction === "right") {
+      const toSend = {
+        "username": username,
+        "type": "like",
+        "parameters": {
+          "index": index.toString(),
+        },
+      };
+      console.log("s", toSend);
+
+      ws.current.send(JSON.stringify(toSend));
+    }
   }
 
   if (!position && !error) {
@@ -167,11 +209,11 @@ function App() {
               <Modal.Body>
                 <form>
                   <input type='range' name='radius' min='1' max='20' step='1' value={radius} onChange={handleRadius} />
-                  <label for='radius'>search radius: {radius}</label>
+                  <label for='radius'>search radius (in miles): {radius}</label>
                 </form>
                 <form>
                   <input type='range' name='price' min='1' max='4' step='1' value={price} onChange={handlePrice} />
-                  <label for='price'>price range: {price}</label>
+                  <label for='price'>price range (1-4): {price}</label>
                 </form>
               </Modal.Body>
               <Modal.Footer>
@@ -198,14 +240,11 @@ function App() {
               <p>
                 Users:
               </p>
-              {users.map((user) => {
-                return (
-                <ul key='{user}'>
-                    <li>{user}</li>
-                </ul>
-                )
-              })
-              }
+              {users.map((user) => 
+              <ul key={user}>
+                  <li>{user}</li>
+              </ul>
+              )}
               <form onSubmit={startRoom}>
                 <input type='submit' value='start' />
               </form>
@@ -215,16 +254,13 @@ function App() {
             </div>
           }
           {start &&
-            <div>
-              {restaurants.map((restaurant) => {
-                return (
-                  <TinderCard key={restaurant.name} onSwipe={onSwipe} preventSwipe={['up', 'down']}>
-                    <div style={`background-image: url('${restaurant.image_url}');`}>
-                      <h3>{restaurant.name}</h3>
-                    </div>
-                  </TinderCard>
-                )
-              })}
+            <div className='cardContainer'>
+              {restaurants.map((restaurant, index) => 
+                <TinderCard key={restaurant.name} className='swipe' onSwipe={(dir) => onSwipe(dir, index)} preventSwipe={['up', 'down']}>
+                  <div className='card' style={{ backgroundImage: `url('${restaurant.image_url}')`}}></div>
+                  <h3 className='cardName'>{restaurant.name}</h3>
+                </TinderCard>
+              )}
             </div>
           }
         </div>
