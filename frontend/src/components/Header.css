@@ -1,0 +1,11 @@
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid orange;
+}
+
+.header__icon {
+    padding-left: 20px;
+    padding-right: 20px;
+}
