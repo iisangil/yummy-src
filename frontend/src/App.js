@@ -171,9 +171,9 @@ const App = () => {
     });
   }
 
-  // useEffect(() => {
-  //   authListener();
-  // }, []);
+  useEffect(() => {
+    authListener();
+  }, []);
 
   const createModal = (e) => {
     e.preventDefault()
@@ -290,72 +290,72 @@ const App = () => {
   return (
     <div>
       {!user &&
-      // <SignIn
-      //   email={email}
-      //   setEmail={setEmail}
-      //   password={password}
-      //   setPassword={setPassword}
-      //   handleSignIn={handleSignIn}
-      //   handleSignup={handleSignup}
-      //   hasAccount={hasAccount}
-      //   setHas={setHas}
-      //   emailErr={emailErr}
-      //   passErr={passErr}
-      //   name={name}
-      //   setName={setName}
-      // />}
-      // {user && room === '' && !start &&
-      // <div>
-      //   <button onClick={handleLogout} >Log Out</button>
-      //   <form onSubmit={createModal}>
-      //     <input type='submit' value='create new room' />
-      //   </form>
+      <SignIn
+        email={email}
+        setEmail={setEmail}
+        password={password}
+        setPassword={setPassword}
+        handleSignIn={handleSignIn}
+        handleSignup={handleSignup}
+        hasAccount={hasAccount}
+        setHas={setHas}
+        emailErr={emailErr}
+        passErr={passErr}
+        name={name}
+        setName={setName}
+      />}
+      {user && room === '' && !start &&
+      <div>
+        <button onClick={handleLogout} >Log Out</button>
+        <form onSubmit={createModal}>
+          <input type='submit' value='create new room' />
+        </form>
 
-      //   <Modal show={show} onHide={handleClose}>
-      //     <Modal.Header closeButton></Modal.Header>
-      //     <Modal.Body>
-      //       <form>
-      //         <input type='range' name='radius' min='1' max='20' step='1' value={radius} onChange={handleRadius} />
-      //         <label for='radius'>search radius (in miles): {radius}</label>
-      //       </form>
-      //       <form>
-      //         <input type='range' name='price' min='1' max='4' step='1' value={price} onChange={handlePrice} />
-      //         <label for='price'>price range (1-4): {price}</label>
-      //       </form>
-      //     </Modal.Body>
-      //     <Modal.Footer>
-      //       <Button variant="primary" onClick={createRoom}>
-      //         Create Room
-      //       </Button>
-      //     </Modal.Footer>
-      //   </Modal>
+        <Modal show={show} onHide={handleClose}>
+          <Modal.Header closeButton></Modal.Header>
+          <Modal.Body>
+            <form>
+              <input type='range' name='radius' min='1' max='20' step='1' value={radius} onChange={handleRadius} />
+              <label for='radius'>search radius (in miles): {radius}</label>
+            </form>
+            <form>
+              <input type='range' name='price' min='1' max='4' step='1' value={price} onChange={handlePrice} />
+              <label for='price'>price range (1-4): {price}</label>
+            </form>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="primary" onClick={createRoom}>
+              Create Room
+            </Button>
+          </Modal.Footer>
+        </Modal>
         
-      //   <form onSubmit={joinRoom}>
-      //     <input type='text' name='roomName' placeholder='enter room name' autoComplete='off' />
-      //     <input type='submit' value='enter' />
-      //   </form>
-      // </div>}
-      // {user && room !== '' && !start &&
-      // <div>
-      //   <p>
-      //     Room: {room}
-      //   </p>
-      //   <p>
-      //     Users:
-      //   </p>
-      //   {users.map((user) => 
-      //   <ul key={user}>
-      //       <li>{user}</li>
-      //   </ul>
-      //   )}
-      //   <form onSubmit={startRoom}>
-      //     <input type='submit' value='start' />
-      //   </form>
-      //   <form onSubmit={leaveRoom}>
-      //     <input type='submit' value='leave room' />
-      //   </form>
-      // </div>}
-      // {start &&
+        <form onSubmit={joinRoom}>
+          <input type='text' name='roomName' placeholder='enter room name' autoComplete='off' />
+          <input type='submit' value='enter' />
+        </form>
+      </div>}
+      {user && room !== '' && !start &&
+      <div>
+        <p>
+          Room: {room}
+        </p>
+        <p>
+          Users:
+        </p>
+        {users.map((user) => 
+        <ul key={user}>
+            <li>{user}</li>
+        </ul>
+        )}
+        <form onSubmit={startRoom}>
+          <input type='submit' value='start' />
+        </form>
+        <form onSubmit={leaveRoom}>
+          <input type='submit' value='leave room' />
+        </form>
+      </div>}
+      {start &&
       <div className="App">
         <Router>
           <Switch>
