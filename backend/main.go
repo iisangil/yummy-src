@@ -12,7 +12,7 @@ import (
 )
 
 func main() {
-	err := godotenv.Load(".env.test")
+	err := godotenv.Load(".env.dist")
 	if err != nil {
 		log.Panic("Error loading .env file:", err)
 	}
