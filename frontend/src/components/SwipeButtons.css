@@ -16,6 +16,11 @@
     color: orangered !important;
 }
 
+.swipeButtons__menu {
+    padding: 2vh !important;
+    color: orange !important;
+}
+
 .swipeButtons__like {
     padding: 2vh !important;
     color: mediumseagreen !important;

@@ -13,7 +13,7 @@ const SwipeButtons = () => {
         <ThumbDownIcon className='swipeButtons__dislike' fontSize='large' />
       </IconButton>
       <IconButton>
-        <MenuBookIcon />
+        <MenuBookIcon className='swipeButtons__menu' fontSize='large' />
       </IconButton>
       <IconButton>
         <ThumbUpIcon className='swipeButtons__like' fontSize='large' />
