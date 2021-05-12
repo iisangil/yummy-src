@@ -96,6 +96,7 @@ const App = () => {
         setUser(userCredential.user);
       })
       .catch((err) => {
+        console.log('error signing in', err);
         switch(err.code) {
           case 'auth/invalid-email':
           case 'auth/user-disabled':
