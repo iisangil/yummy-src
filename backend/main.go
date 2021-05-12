@@ -19,7 +19,7 @@ func main() {
 
 	hub := socket.MakeHub()
 	r := mux.NewRouter()
-	r.HandleFunc("/ws/{username}/{room}", hub.HandleWebSockets)
+	r.HandleFunc("/ws/{room}/{username}", hub.HandleWebSockets)
 
 	port, exists := os.LookupEnv("PORT")
 	if exists == false {

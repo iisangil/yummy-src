@@ -192,7 +192,7 @@ const App = () => {
 
     const roomName = rand.generate(8);
     setRoom(roomName);
-    ws.current = new WebSocket('ws:/localhost:8000/ws/'+roomName+'/'+user.displayName);
+    ws.current = new WebSocket('ws://localhost:8000/ws/'+roomName+'/'+user.displayName);
 
     const toSend = {
       "username": user.displayName,
