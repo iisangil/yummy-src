@@ -153,6 +153,7 @@ const App = () => {
     fire.auth().signOut().then(() => {
       clearInputs();
       setUser(null);
+      setDisplay('');
       setRoom('');
       setStart(false);
       console.log('signed out');
@@ -197,7 +198,7 @@ const App = () => {
     ws.current = new WebSocket('ws://localhost:8000/ws/'+roomName+'/'+user.displayName);
 
     const toSend = {
-      "username": user.displayName,
+      "username": displayName,
       "type": "get",
       parameters: { 
         "radius": radius.toString(),
@@ -220,7 +221,7 @@ const App = () => {
       ws.current = new WebSocket('ws://localhost:8000/ws/'+roomName+'/'+user.displayName);
 
       const toSend = {
-        "username": user.displayName,
+        "username": displayName,
         "type": "get",
       };
       console.log("s", toSend);
