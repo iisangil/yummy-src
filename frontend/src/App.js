@@ -30,7 +30,8 @@ const App = () => {
   const [name, setName] = useState('');
 
   const [user, setUser] = useState(null);
-  const [room, setRoom] = useState("")
+  const [room, setRoom] = useState('');
+  const [display, setDisplay] = useState('');
 
   const [users, setUsers] = useState([]);
   const [restaurants, setRestaurants] = useState([]);
@@ -94,6 +95,7 @@ const App = () => {
       .then((userCredential) => {
         console.log('credential', userCredential);
         setUser(userCredential.user);
+        setDisplay(userCredential.displayName);
       })
       .catch((err) => {
         console.log('error signing in', err);
@@ -115,6 +117,7 @@ const App = () => {
 
   const handleSignup = () => {
     clearErrors();
+    setDisplay(name);
     fire
       .auth()
       .createUserWithEmailAndPassword(email, password)
@@ -123,9 +126,7 @@ const App = () => {
           displayName: name,
         })
         .then(() => {
-          console.log('current', fire.auth().currentUser);
-          console.log('current name', fire.auth().currentUser.displayNamef);
-          setUser(fire.auth().currentUser);
+          setUser(userCredential.user);
         })
         .catch((err) => {
           console.log('error updating profile', err);
@@ -163,10 +164,11 @@ const App = () => {
 
   const authListener = () => {
     fire.auth().onAuthStateChanged((thing) => {
-      console.log('auth state changed', thing);
       if (thing) {
-        console.log('display', thing.displayName);
         setUser(thing);
+        if (thing.displayName) {
+          setDisplay(thing.displayName);
+        }
       }
     });
   }
@@ -306,6 +308,7 @@ const App = () => {
       />}
       {user && room === '' && !start &&
       <div>
+        <p>Welcome, {display}</p>
         <button onClick={handleLogout} >Log Out</button>
         <form onSubmit={createModal}>
           <input type='submit' value='create new room' />
