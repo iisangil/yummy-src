@@ -18,50 +18,56 @@ const SignIn = (props) => {
     setName
   } = props;
   return (
-    <section>
-      <div>
-        {!hasAccount && 
+    <div>
+      {hasAccount ? (
+        <h2>Log In</h2>
+      ) : (
         <div>
+          <h2>Register</h2>
           <label>Name</label>
           <input
-          type='text'
-          required
-          value={name}
-          onChange={(e) => setName(e.target.value)}
+           className='signIn__input'
+           type='text'
+           required
+           value={name}
+           onChange={(e) => setName(e.target.value)}
           />
-        </div>}
-        <label>Email</label>
-        <input
-        type='text'
-        autoFocus
-        required
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        />
-        <p>{emailErr}</p>
-        <label>Password</label>
-        <input
-        type='password'
-        required
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        />
-        <p>{passErr}</p>
-        <div>
-          {hasAccount ? (
-            <div>
-            <button onClick={handleSignIn} >Sign In</button>
-            <p>Don't have an account? <span onClick={() => setHas(!hasAccount)} >Sign Up</span></p>
-            </div>
-          ) : (
-            <div>
-            <button onClick={handleSignup} >Sign Up</button>
-            <p>Have an account? <span onClick={() => setHas(!hasAccount)} >Sign In</span></p>
-            </div>
-          )}
         </div>
+      )
+      }
+      <label>Email</label>
+      <input
+       className='signIn__input'
+       type='text'
+       autoFocus
+       required
+       value={email}
+       onChange={(e) => setEmail(e.target.value)}
+      />
+      <p className='signIn__p' >{emailErr}</p>
+      <label>Password</label>
+      <input
+       className='signIn__input'
+       type='password'
+       required
+       value={password}
+       onChange={(e) => setPassword(e.target.value)}
+      />
+      <p className='signIn__p' >{passErr}</p>
+      <div>
+        {hasAccount ? (
+          <div>
+          <button className='signIn__button' onClick={handleSignIn} >Sign In</button>
+          <p>Don't have an account? <span className='signIn__span' onClick={() => setHas(!hasAccount)} ><u>Sign Up</u></span></p>
+          </div>
+        ) : (
+          <div>
+          <button className='signIn__button' onClick={handleSignup} >Sign Up</button>
+          <p className='signIn__p' >Have an account? <span className='signIn__span' onClick={() => setHas(!hasAccount)} ><u>Sign In</u></span></p>
+          </div>
+        )}
       </div>
-    </section>
+    </div>
   );
 }
 

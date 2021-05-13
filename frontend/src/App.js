@@ -198,7 +198,7 @@ const App = () => {
     ws.current = new WebSocket('ws://localhost:8000/ws/'+roomName+'/'+user.displayName);
 
     const toSend = {
-      "username": displayName,
+      "username": display,
       "type": "get",
       parameters: { 
         "radius": radius.toString(),
@@ -221,7 +221,7 @@ const App = () => {
       ws.current = new WebSocket('ws://localhost:8000/ws/'+roomName+'/'+user.displayName);
 
       const toSend = {
-        "username": displayName,
+        "username": display,
         "type": "get",
       };
       console.log("s", toSend);
@@ -360,7 +360,7 @@ const App = () => {
         </form>
       </div>}
       {start &&
-      <div className="App">
+      <div>
         <Router>
           <Switch>
             <Route path="/room">

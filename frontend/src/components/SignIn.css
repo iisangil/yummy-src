@@ -1,0 +1,34 @@
+.signIn__input {
+    width: 80%;
+    padding: 12px 20px;
+    margin: 8px;
+    margin-right: 10%;
+    margin-left: 10%;
+    display: inline-block;
+    border: 1px solid orange;
+    box-sizing: border-box;
+}
+
+.signIn__button {
+    background-color: orange;
+    color: white;
+    padding: 14px 20px;
+    margin: 8px;
+    margin-right: 10%;
+    margin-left: 10%;
+    border: none;
+    cursor: pointer;
+    width: 80%;
+}
+
+.signIn__button:hover {
+    opacity: 0.8;
+}
+
+.signIn__span:hover {
+    color: orange;
+}
+
+.signIn__p {
+    padding: 16px;
+}
