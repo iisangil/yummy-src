@@ -18,3 +18,25 @@
     cursor: pointer;
     width: 80%;
 }
+
+.modal__code {
+    float: right;
+}
+
+.modal__input {
+    border: 1px solid orange;
+    padding: 6px;
+}
+
+.modal__label {
+    padding: 6px;
+}
+
+.modal__button {
+    background-color: orange;
+    color: white;
+    padding: 10px;
+    border: none;
+    cursor: pointer;
+    width: 20%;
+}

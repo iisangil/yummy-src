@@ -44,26 +44,29 @@ const Home = ({ display, handleLogout, code, setCode, createRoom, joinRoom }) =>
             Hi
           </Modal.Body>
           <Modal.Footer>
-            <Button onClick={createRoom} >Create</Button>
+            <Button bsPrefix='modal__button' onClick={createRoom} >Create</Button>
           </Modal.Footer>
         </Modal>        
         <button className='home__button' onClick={() => {handleShow('join')}} >Join a Room</button>
-        <Modal show={join} onHide={() => {handleClose('join')}}>
+        <Modal show={join} onHide={() => {handleClose('join')}} >
           <Modal.Header closeButton>
             <Modal.Title>Join a Room</Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            Hi again
+            <div className='modal__code' >
+              <label className='modal__label' >Room Code:</label>
+              <input
+              className='modal__input'
+              type='text'
+              required
+              autoFocus
+              value={code}
+              onChange={(e) => {setCode(e.target.value)}}
+              />
+            </div>
           </Modal.Body>
           <Modal.Footer>
-            <input
-             type='text'
-             required
-             autoFocus
-             value={code}
-             onChange={(e) => {setCode(e.target.value)}}
-            />
-            <Button onClick={joinRoom} >Join</Button>
+            <Button bsPrefix='modal__button' onClick={joinRoom} >Join</Button>
           </Modal.Footer>
         </Modal>
       </div>
