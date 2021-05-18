@@ -1,4 +1,4 @@
-import { React } from 'react';
+import React from 'react';
 
 import './SignIn.css';
 
@@ -18,13 +18,13 @@ const SignIn = (props) => {
     setName
   } = props;
   return (
-    <div>
+    <div className='signIn' >
       {hasAccount ? (
         <h2>Log In</h2>
       ) : (
         <div>
           <h2>Register</h2>
-          <label>Name</label>
+          <label>Username</label>
           <input
            className='signIn__input'
            type='text'

@@ -1,0 +1,20 @@
+.home {
+    display: block;
+    padding: 16px;
+}
+
+.home__dropDown {
+    float: right;
+}
+
+.home__button {
+    background-color: orange;
+    color: white;
+    padding: 14px 20px;
+    margin: 8px;
+    margin-right: 10%;
+    margin-left: 10%;
+    border: none;
+    cursor: pointer;
+    width: 80%;
+}

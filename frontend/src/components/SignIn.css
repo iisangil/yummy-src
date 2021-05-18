@@ -1,3 +1,7 @@
+.signIn {
+    padding: 16px;
+}
+
 .signIn__input {
     width: 80%;
     padding: 12px 20px;

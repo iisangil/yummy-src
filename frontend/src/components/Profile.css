@@ -1,0 +1,19 @@
+.profile {
+    padding: 16px;
+    width: 150px;
+    border-radius: 20px;
+    border-style: solid;
+    border-color: orange;
+    border-width: 1px;
+}
+
+.profile:hover {
+    background-color: white;
+    box-shadow: 0px 10px 53px 0px rgba(0, 0, 0, 0.3) !important;
+}
+
+.profile__button {
+    display: flex;
+    align-items: center;
+}
+
