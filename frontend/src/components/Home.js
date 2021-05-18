@@ -5,7 +5,26 @@ import Button from 'react-bootstrap/Button';
 
 import './Home.css';
 
-const Home = ({ display, handleLogout, code, setCode, createRoom, joinRoom }) => {
+const Home = (props) => {
+  const {
+    display,
+    handleLogout,
+    code,
+    setCode,
+    createRoom,
+    joinRoom,
+    radius,
+    setRadius,
+    one,
+    setOne,
+    two,
+    setTwo,
+    three,
+    setThree,
+    four,
+    setFour
+  } = props;
+
   const [create, setCreate] = useState(false);
   const [join, setJoin] = useState(false);
 
@@ -41,7 +60,30 @@ const Home = ({ display, handleLogout, code, setCode, createRoom, joinRoom }) =>
             <Modal.Title>Create a Room</Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            Hi
+            <div>
+              <div className='modal__option' >
+                <label className='modal__label' >Restaurant Radius (in miles): {radius}</label>
+                <input
+                type='range'
+                min='1'
+                max='20'
+                step='1'
+                value={radius}
+                onChange={(e) => {setRadius(e.target.value)}}
+                />
+              </div>
+              <div className='modal__option' >
+                <label className='modal__label' >Price Range:</label>
+                <label className='modal__label' >$</label>
+                <input type='checkbox' checked={one} onChange={(e) => {setOne(e.target.checked)}} />
+                <label className='modal__label' >$$</label>
+                <input type='checkbox' checked={two} onChange={(e) => {setTwo(e.target.checked)}} />
+                <label className='modal__label' >$$$</label>
+                <input type='checkbox' checked={three} onChange={(e) => {setThree(e.target.checked)}} />
+                <label className='modal__label' >$$$$</label>
+                <input type='checkbox' checked={four} onChange={(e) => {setFour(e.target.checked)}} />
+              </div>
+            </div>
           </Modal.Body>
           <Modal.Footer>
             <Button bsPrefix='modal__button' onClick={createRoom} >Create</Button>
@@ -53,7 +95,7 @@ const Home = ({ display, handleLogout, code, setCode, createRoom, joinRoom }) =>
             <Modal.Title>Join a Room</Modal.Title>
           </Modal.Header>
           <Modal.Body>
-            <div className='modal__code' >
+            <div className='modal__join' >
               <label className='modal__label' >Room Code:</label>
               <input
               className='modal__input'

@@ -5,6 +5,7 @@
 
 .home__dropDown {
     float: right;
+    padding-bottom: 50px;
 }
 
 .home__button {
@@ -19,7 +20,12 @@
     width: 80%;
 }
 
-.modal__code {
+.modal__option {
+    float: right;
+}
+
+
+.modal__join {
     float: right;
 }
 
@@ -29,6 +35,7 @@
 }
 
 .modal__label {
+    margin: 3px;
     padding: 6px;
 }
 

@@ -1,8 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useCurrentPosition } from 'react-use-geolocation';
 
-import Modal from 'react-bootstrap/Modal';
-import Button from 'react-bootstrap/Button';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 
 import Header from './components/Header';
@@ -29,11 +27,16 @@ const App = () => {
   const [hasAccount, setHas] = useState(true);
 
   const [name, setName] = useState('');
-
   const [user, setUser] = useState(null);
+  const [display, setDisplay] = useState('');
+
   const [room, setRoom] = useState('');
   const [code, setCode] = useState('');
-  const [display, setDisplay] = useState('');
+
+  const [one, setOne] = useState(false);
+  const [two, setTwo] = useState(false);
+  const [three, setThree] = useState(false);
+  const [four, setFour] = useState(false);
 
   const [users, setUsers] = useState([]);
   const [restaurants, setRestaurants] = useState([]);
@@ -195,12 +198,18 @@ const App = () => {
       'ws://localhost:8000/ws/' + roomName + '/' + user.displayName
     );
 
+    var price = '';
+    if (one) price += '1,';
+    if (two) price += '2,';
+    if (three) price += '3,';
+    if (four) price += '4,';
+
     const toSend = {
       username: display,
       type: 'get',
       parameters: {
         radius: radius.toString(),
-        price: price.toString(),
+        price: price,
         latitude: position.coords.latitude.toString(),
         longitude: position.coords.longitude.toString(),
       },
@@ -324,6 +333,16 @@ const App = () => {
        setCode={setCode}
        createRoom={createRoom}
        joinRoom={joinRoom}
+       radius={radius}
+       setRadius={setRadius}
+       one={one}
+       setOne={setOne}
+       two={two}
+       setTwo={setTwo}
+       three={three}
+       setThree={setThree}
+       four={four}
+       setFour={setFour}
       />}
       {user && room !== '' && !start && 
       <div>
