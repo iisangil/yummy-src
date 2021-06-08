@@ -366,15 +366,15 @@ const App = () => {
         <div>
         <Router>
           <Switch>
-            <Route path='/room'>
+            <Route path='/yummy/room'>
               <Header current='room' />
               <Room users={users} />
             </Route>
-            <Route path='/matches'>
+            <Route path='/yummy/matches'>
               <Header current='matches' />
               <Matches matches={matches} restaurants={restaurants} />
             </Route>
-            <Route path='/'>
+            <Route path='/yummy'>
               <Header current='main' />
               <TinderCards
                 restaurants={restaurants}

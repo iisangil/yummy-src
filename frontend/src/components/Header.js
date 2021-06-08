@@ -12,7 +12,7 @@ const Header = ({ current }) => {
   return (
     <div className='header' >
       {current === 'room' ? (
-        <Link to='/room' >
+        <Link to='/yummy/room' >
           <IconButton>
             <PeopleIcon
              style={{ color: orange[500] }}
@@ -22,14 +22,14 @@ const Header = ({ current }) => {
           </IconButton>
         </Link>
       ) : (
-        <Link to='/room' >
+        <Link to='/yummy/room' >
           <IconButton>
             <PeopleIcon className='header__icon' />
           </IconButton>
         </Link>
       )}
       {current === 'main' ? (
-        <Link to='/' >
+        <Link to='/yummy' >
           <IconButton>
             <RestaurantMenuIcon
              style={{ color: orange[500] }}
@@ -38,14 +38,14 @@ const Header = ({ current }) => {
           </IconButton>
         </Link>
       ) : (
-        <Link to='/' >
+        <Link to='/yummy' >
           <IconButton>
             <RestaurantMenuIcon />
           </IconButton>
         </Link>
       )}
       {current === 'matches' ? (
-        <Link to='/matches' >
+        <Link to='/yummy/matches' >
           <IconButton>
             <FavoriteIcon
              style={{ color: orange[500] }}
@@ -55,7 +55,7 @@ const Header = ({ current }) => {
           </IconButton>
         </Link>
       ) : (
-        <Link to='/matches' >
+        <Link to='/yummy/matches' >
           <IconButton>
             <FavoriteIcon className='header__icon' />
           </IconButton>
