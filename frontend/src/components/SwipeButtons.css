@@ -12,16 +12,16 @@
 }
 
 .swipeButtons__dislike {
-    padding: 2vh !important;
+    padding: 2px !important;
     color: orangered !important;
 }
 
 .swipeButtons__menu {
-    padding: 2vh !important;
+    padding: 2px !important;
     color: orange !important;
 }
 
 .swipeButtons__like {
-    padding: 2vh !important;
+    padding: 2px !important;
     color: mediumseagreen !important;
 }

@@ -15,15 +15,25 @@ const SignIn = (props) => {
     emailErr,
     passErr,
     name,
-    setName
+    setName,
+    clearInputs,
+    clearErrors,
   } = props;
+
+  const changeHas = () => {
+    clearInputs();
+    clearErrors();
+    setHas(!hasAccount);
+  }
+
   return (
     <div className='signIn' >
+      <h2>Yummy</h2>
       {hasAccount ? (
-        <h2>Log In</h2>
+        <h4>Log In</h4>
       ) : (
         <div>
-          <h2>Register</h2>
+          <h4>Register</h4>
           <label>Username</label>
           <input
            className='signIn__input'
@@ -58,12 +68,12 @@ const SignIn = (props) => {
         {hasAccount ? (
           <div>
           <button className='signIn__button' onClick={handleSignIn} >Sign In</button>
-          <p className='signIn__p' >Don't have an account? <span className='signIn__span' onClick={() => setHas(!hasAccount)} ><u>Sign Up</u></span></p>
+          <p className='signIn__p' >Don't have an account? <span className='signIn__span' onClick={changeHas} ><u>Sign Up</u></span></p>
           </div>
         ) : (
           <div>
           <button className='signIn__button' onClick={handleSignup} >Sign Up</button>
-          <p className='signIn__p' >Have an account? <span className='signIn__span' onClick={() => setHas(!hasAccount)} ><u>Sign In</u></span></p>
+          <p className='signIn__p' >Have an account? <span className='signIn__span' onClick={changeHas} ><u>Sign In</u></span></p>
           </div>
         )}
       </div>

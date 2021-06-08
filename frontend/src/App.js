@@ -323,6 +323,8 @@ const App = () => {
           passErr={passErr}
           name={name}
           setName={setName}
+          clearInputs={clearInputs}
+          clearErrors={clearErrors}
         />
       )}
       {user && room === '' && !start &&
