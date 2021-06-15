@@ -46,7 +46,6 @@ const App = () => {
   const ws = useRef(null);
 
   const [radius, setRadius] = useState(10);
-  const [price, setPrice] = useState(2);
 
   const [position, error] = useCurrentPosition();
 
@@ -202,6 +201,7 @@ const App = () => {
     if (two) price += '2,';
     if (three) price += '3,';
     if (four) price += '4,';
+    console.log('PRICE', price);
 
     const toSend = {
       username: display,
@@ -244,7 +244,6 @@ const App = () => {
     setRoom('');
     setRestaurants([]);
     setRadius(10);
-    setPrice(2);
   };
 
   const startRoom = (e) => {
@@ -260,12 +259,6 @@ const App = () => {
     e.preventDefault();
 
     setRadius(e.target.value);
-  };
-
-  const handlePrice = (e) => {
-    e.preventDefault();
-
-    setPrice(e.target.value);
   };
 
   const onLeave = (direction, index) => {

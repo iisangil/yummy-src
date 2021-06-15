@@ -1,11 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import TinderCard from 'react-tinder-card'
+import Modal from 'react-bootstrap/Modal';
 
 import SwipeButtons from './SwipeButtons';
 
 import "./TinderCards.css";
 
 const TinderCards = ({ restaurants, onLeave, begin }) => {
+  const [menu, setMenu] = useState(false);
+
   const cards = restaurants.slice(begin+1);
   console.log('CARDS', cards);
 
@@ -30,6 +33,15 @@ const TinderCards = ({ restaurants, onLeave, begin }) => {
     console.log('REMOVED', removedCards);
     onLeave(dir, index);
   }
+
+  const showMenu = () => {
+    setMenu(true);
+    console.log('test');
+  }
+
+  const closeMenu = () => {
+    setMenu(false);
+  }
   
   return (
     <div className='cardContainer' >
@@ -46,7 +58,14 @@ const TinderCards = ({ restaurants, onLeave, begin }) => {
           </div>
         </TinderCard>
       )).reverse()}
-      <SwipeButtons swipe={buttonSwipe} />
+
+      <Modal show={menu} onHide={() => { closeMenu() }}>
+      </Modal >
+
+      <SwipeButtons
+       swipe={buttonSwipe}
+       showMenu={showMenu}
+      />
     </div>
   );
 }
