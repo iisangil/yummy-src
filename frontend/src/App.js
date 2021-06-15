@@ -5,7 +5,6 @@ import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 
 import Header from './components/Header';
 import TinderCards from './components/TinderCards';
-import SwipeButtons from './components/SwipeButtons';
 import Room from './components/Room';
 import Matches from './components/Matches';
 import SignIn from './components/SignIn';
@@ -381,7 +380,6 @@ const App = () => {
                 onLeave={onLeave}
                 begin={begin}
               />
-              <SwipeButtons />
             </Route>
           </Switch>
         </Router>
