@@ -10,33 +10,20 @@ const TinderCards = ({ restaurants, onLeave, begin }) => {
   const [menu, setMenu] = useState(false);
 
   const cards = restaurants.slice(begin+1);
-  console.log('CARDS', cards);
-
   const cardRefs = cards.map(() => React.createRef());
 
-  const removedCards = [];
+  const [current, setCurrent] = useState(cards[0])
 
   const buttonSwipe = (dir) => {
-    const cardsLeft = cards.filter(restaurant => !removedCards.includes(restaurant));
-    console.log('CARDSLEFT', cardsLeft);
-    if (cardsLeft.length) {
-      const swipeCard = cardsLeft[0];
-      console.log('SWIPECARD', swipeCard);
-      const swipeIndex = cards.map(restaurant => restaurant.id).indexOf(swipeCard.id);
-      console.log('SWIPEINDEX', swipeIndex);
-      cardRefs[swipeIndex].current.swipe(dir);
+    if (cards.length) {
+      cardRefs[0].current.swipe(dir);
     }
   }
 
-  const removeLeave = (dir, index, restaurant) => {
-    removedCards.push(restaurant);
-    console.log('REMOVED', removedCards);
-    onLeave(dir, index);
-  }
-
-  const showMenu = () => {
+  const showMenu = () => {    
     setMenu(true);
-    console.log('test');
+
+
   }
 
   const closeMenu = () => {
@@ -51,7 +38,7 @@ const TinderCards = ({ restaurants, onLeave, begin }) => {
          className='swipe'
          key={restaurant.id}
          preventSwipe={['down', 'up']}
-         onCardLeftScreen={(dir) => removeLeave(dir, index+begin+1, restaurant)}
+         onCardLeftScreen={(dir) => onLeave(dir, index+begin+1)}
         >
           <div className='card' style={{ backgroundImage: `url('${restaurant.image_url}')` }} >
             <h3>{restaurant.name}</h3>
@@ -60,6 +47,9 @@ const TinderCards = ({ restaurants, onLeave, begin }) => {
       )).reverse()}
 
       <Modal show={menu} onHide={() => { closeMenu() }}>
+        <Modal.Header closeButton >
+          <Modal.Title>{current.name}</Modal.Title>
+        </Modal.Header>
       </Modal >
 
       <SwipeButtons
