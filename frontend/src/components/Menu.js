@@ -20,7 +20,7 @@ const Menu = (props) => {
           <IconButton href={ 'tel:' + current.phone } >
             <PhoneIcon />
           </IconButton>
-          {current.phone}
+          {current.display_phone}
         </div>
       </Modal.Body>
     </Modal>
