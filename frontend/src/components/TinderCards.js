@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import TinderCard from 'react-tinder-card'
-// import Modal from 'react-bootstrap/Modal';
 
 import SwipeButtons from './SwipeButtons';
 import Menu from './Menu';
@@ -46,19 +45,11 @@ const TinderCards = ({ restaurants, onLeave, begin }) => {
           </div>
         </TinderCard>
       )).reverse()}
-
       <Menu
        current={current}
        menu={menu}
        closeMenu={closeMenu}
       />
-
-      {/* <Modal show={menu} onHide={() => { closeMenu() }}>
-        <Modal.Header closeButton >
-          <Modal.Title>{current.name}</Modal.Title>
-        </Modal.Header>
-      </Modal > */}
-
       <SwipeButtons
        swipe={buttonSwipe}
        showMenu={showMenu}
