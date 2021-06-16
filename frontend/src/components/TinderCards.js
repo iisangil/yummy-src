@@ -22,7 +22,7 @@ const TinderCards = ({ restaurants, onLeave, begin }) => {
 
   const showMenu = () => {    
     setMenu(true);
-
+    console.log('CURRENT', current);
 
   }
 
