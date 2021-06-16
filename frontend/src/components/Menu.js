@@ -1,7 +1,11 @@
 import React from 'react';
 import Modal from 'react-bootstrap/Modal';
-import IconButton from '@material-ui/core/IconButton';
 import PhoneIcon from '@material-ui/icons/Phone';
+import MonetizationOnIcon from '@material-ui/icons/MonetizationOn';
+import StarsIcon from '@material-ui/icons/Stars';
+import StarRatingComponent from 'react-star-rating-component';
+
+import './Menu.css';
 
 const Menu = (props) => {
   const {
@@ -17,12 +21,24 @@ const Menu = (props) => {
       </Modal.Header>
       <Modal.Body>
         <div>
-          <IconButton href={ 'tel:' + current.phone } >
+          <div className='info' >
             <PhoneIcon />
-          </IconButton>
-          {current.display_phone}
+            <a href={ 'tel:' + current.phone } >{current.display_phone}</a>
+          </div>
+          <div className='info' >
+            <MonetizationOnIcon />
+            <a>{current.price}</a>
+          </div>
         </div>
       </Modal.Body>
+      <Modal.Footer>
+        <StarRatingComponent
+         name='rating'
+         value={current.rating}
+         starColor='orange'
+         editing={false}
+        />
+      </Modal.Footer>
     </Modal>
   );
 }
