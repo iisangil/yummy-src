@@ -2,7 +2,6 @@ import React from 'react';
 import Modal from 'react-bootstrap/Modal';
 import PhoneIcon from '@material-ui/icons/Phone';
 import MonetizationOnIcon from '@material-ui/icons/MonetizationOn';
-import StarsIcon from '@material-ui/icons/Stars';
 import StarRatingComponent from 'react-star-rating-component';
 
 import './Menu.css';

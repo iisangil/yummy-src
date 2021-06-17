@@ -17,6 +17,17 @@ const TinderCards = ({ restaurants, onLeave, begin }) => {
   const buttonSwipe = (dir) => {
     if (cards.length) {
       cardRefs[0].current.swipe(dir);
+      if (cards.length === 1) {
+        setCurrent({
+          name: 'null',
+          phone: '0000000000',
+          display_phone: '0000000000',
+          price: 'n/a',
+          rating: '0',
+        });
+      } else {
+        setCurrent(cards[1]);
+      }
     }
   }
 

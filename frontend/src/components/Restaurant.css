@@ -1,0 +1,21 @@
+.restaurant {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px;
+    height: 70px;
+    border-bottom: 1px solid #fafafa;
+}
+
+.restaurant:hover {
+    background-color: white;
+    box-shadow: 0px 10px 53px 0px rgba(0, 0, 0, 0.3) !important;
+}
+
+.restaurant__image {
+    margin-right: 20px;
+}
+
+.restaurant__name {
+    flex: 1;
+}

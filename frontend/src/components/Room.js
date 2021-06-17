@@ -1,8 +1,6 @@
 import React from 'react';
 import User from './User';
 
-import "./Room.css";
-
 const Room = ({ users }) => {
   return (
     <div className='room' >
