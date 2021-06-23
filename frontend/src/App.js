@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useCurrentPosition } from 'react-use-geolocation';
+import LoadingOverlay from 'react-loading-overlay';
 
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 
@@ -31,6 +32,7 @@ const App = () => {
 
   const [room, setRoom] = useState('');
   const [code, setCode] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const [one, setOne] = useState(false);
   const [two, setTwo] = useState(false);
@@ -59,6 +61,8 @@ const App = () => {
       switch (message.type) {
         case 'users':
           setUsers(message.users);
+          setLoading(false);
+
           break;
         case 'get':
           setRestaurants((restaurants) => [
@@ -192,6 +196,8 @@ const App = () => {
   const createRoom = () => {
     const roomName = rand.generate(8);
     setRoom(roomName);
+    setLoading(true);
+
     ws.current = new WebSocket(
       'ws://localhost:8000/ws/' + roomName + '/' + user.displayName
     );
@@ -220,6 +226,7 @@ const App = () => {
   const joinRoom = () => {
     if (code !== '') {
       setRoom(code);
+      setLoading(true);
 
       ws.current = new WebSocket(
         'ws://localhost:8000/ws/' + code + '/' + user.displayName
@@ -255,12 +262,6 @@ const App = () => {
     ws.current.send(JSON.stringify(toSend));
   };
 
-  const handleRadius = (e) => {
-    e.preventDefault();
-
-    setRadius(e.target.value);
-  };
-
   const onLeave = (direction, index) => {
     console.log(
       'you swiped',
@@ -286,12 +287,11 @@ const App = () => {
     }
   };
 
-  // if (!position && !error) {
-  //   return <p>Waiting for location...</p>;
-  // }
-  // if (error) {
-  //   return <p>Yummy needs your location to be used. Please allow location services.</p>;
-  // }
+  if (error) {
+    return (
+      <p>Yummy requires location services. Please enable location services.</p>
+    )
+  }
 
   return (
     <div>
@@ -301,59 +301,83 @@ const App = () => {
        integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l"
        crossorigin="anonymous"
       />
-      {!user && (
+      {!user &&
+      <LoadingOverlay
+       active={!position}
+       spinner
+       text='Fetching your location...'
+      >
         <SignIn
-          email={email}
-          setEmail={setEmail}
-          password={password}
-          setPassword={setPassword}
-          handleSignIn={handleSignIn}
-          handleSignup={handleSignup}
-          hasAccount={hasAccount}
-          setHas={setHas}
-          emailErr={emailErr}
-          passErr={passErr}
-          name={name}
-          setName={setName}
-          clearInputs={clearInputs}
-          clearErrors={clearErrors}
+         email={email}
+         setEmail={setEmail}
+         password={password}
+         setPassword={setPassword}
+         handleSignIn={handleSignIn}
+         handleSignup={handleSignup}
+         hasAccount={hasAccount}
+         setHas={setHas}
+         emailErr={emailErr}
+         passErr={passErr}
+         name={name}
+         setName={setName}
+         clearInputs={clearInputs}
+         clearErrors={clearErrors}
         />
-      )}
+        <footer>
+          <p>Check out the <a href='https://github.com/iisangil/yummy-src' >source code</a>!</p>
+        </footer>
+      </LoadingOverlay>
+      }
       {user && room === '' && !start &&
-      <Home
-       display={display}
-       handleLogout={handleLogout}
-       code={code}
-       setCode={setCode}
-       createRoom={createRoom}
-       joinRoom={joinRoom}
-       radius={radius}
-       setRadius={setRadius}
-       one={one}
-       setOne={setOne}
-       two={two}
-       setTwo={setTwo}
-       three={three}
-       setThree={setThree}
-       four={four}
-       setFour={setFour}
-      />}
-      {user && room !== '' && !start && 
-      <div>
-        <p>Room: {room}</p>
-        <p>Users:</p>
-        {users.map((user) => (
-          <ul key={user}>
-            <li>{user}</li>
-          </ul>
-        ))}
-        <form onSubmit={startRoom}>
-          <input type='submit' value='start' />
-        </form>
-        <form onSubmit={leaveRoom}>
-          <input type='submit' value='leave room' />
-        </form>
-      </div>}
+      <LoadingOverlay
+       active={!position}
+       spinner
+       text='Fetching your location...'
+      >
+        <Home
+         display={display}
+         handleLogout={handleLogout}
+         code={code}
+         setCode={setCode}
+         createRoom={createRoom}
+         joinRoom={joinRoom}
+         radius={radius}
+         setRadius={setRadius}
+         one={one}
+         setOne={setOne}
+         two={two}
+         setTwo={setTwo}
+         three={three}
+         setThree={setThree}
+         four={four}
+         setFour={setFour}
+        />
+        <footer>
+          <p>Check out the <a href='https://github.com/iisangil/yummy-src' >source code</a>!</p>
+        </footer>
+      </LoadingOverlay>}
+      {user && room !== '' && !start &&
+      <LoadingOverlay
+       active={loading}
+       spinner
+       text='Fetching data...'
+      >
+        <div>
+          <p>Room: {room}</p>
+          <p>Users:</p>
+          {users.map((user) => (
+            <ul key={user}>
+              <li>{user}</li>
+            </ul>
+          ))}
+          <form onSubmit={startRoom}>
+            <input type='submit' value='start' />
+          </form>
+          <form onSubmit={leaveRoom}>
+            <input type='submit' value='leave room' />
+          </form>
+        </div>
+      </LoadingOverlay>}
       {start &&
         <div>
         <Router>
