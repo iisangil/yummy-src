@@ -287,11 +287,11 @@ const App = () => {
     }
   };
 
-  if (error) {
-    return (
-      <p>Yummy requires location services. Please enable location services.</p>
-    )
-  }
+  // if (error) {
+  //   return (
+  //     <p>Yummy requires location services. Please enable location services and refresh this page.</p>
+  //   )
+  // }
 
   return (
     <div>
@@ -301,12 +301,36 @@ const App = () => {
        integrity="sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l"
        crossorigin="anonymous"
       />
-      {!user &&
-      <LoadingOverlay
-       active={!position}
-       spinner
-       text='Fetching your location...'
-      >
+      {error &&
+      <div>
+        <LoadingOverlay
+         active={true}
+         spinner
+         text='Yummy requires location services. Please enable location services and refresh this page.'
+        >
+          <SignIn
+           email={email}
+           setEmail={setEmail}
+           password={password}
+           setPassword={setPassword}
+           handleSignIn={handleSignIn}
+           handleSignup={handleSignup}
+           hasAccount={hasAccount}
+           setHas={setHas}
+           emailErr={emailErr}
+           passErr={passErr}
+           name={name}
+           setName={setName}
+           clearInputs={clearInputs}
+           clearErrors={clearErrors}
+          />
+        </LoadingOverlay>
+        <footer>
+          <p>Check out the <a href='https://github.com/iisangil/yummy-src' >source code</a>!</p>
+        </footer>
+      </div>}
+      {!user && !error &&
+      <div>
         <SignIn
          email={email}
          setEmail={setEmail}
@@ -326,9 +350,9 @@ const App = () => {
         <footer>
           <p>Check out the <a href='https://github.com/iisangil/yummy-src' >source code</a>!</p>
         </footer>
-      </LoadingOverlay>
+      </div>
       }
-      {user && room === '' && !start &&
+      {user && room === '' && !start && !error &&
       <LoadingOverlay
        active={!position}
        spinner
@@ -356,7 +380,7 @@ const App = () => {
           <p>Check out the <a href='https://github.com/iisangil/yummy-src' >source code</a>!</p>
         </footer>
       </LoadingOverlay>}
-      {user && room !== '' && !start &&
+      {user && room !== '' && !start && !error &&
       <LoadingOverlay
        active={loading}
        spinner
@@ -378,7 +402,7 @@ const App = () => {
           </form>
         </div>
       </LoadingOverlay>}
-      {start &&
+      {start && !error &&
         <div>
         <Router>
           <Switch>
