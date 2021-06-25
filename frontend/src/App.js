@@ -263,6 +263,7 @@ const App = () => {
   };
 
   const onLeave = (direction, index) => {
+    setBegin(index);
     console.log(
       'you swiped',
       direction,
@@ -270,8 +271,6 @@ const App = () => {
       restaurants[parseInt(index)].name
     );
     if (direction === 'right') {
-      setBegin(index);
-
       const toSend = {
         username: user.uid,
         type: 'like',
@@ -282,16 +281,8 @@ const App = () => {
       console.log('s', toSend);
 
       ws.current.send(JSON.stringify(toSend));
-    } else if (direction === 'left') {
-      setBegin(index);
     }
   };
-
-  // if (error) {
-  //   return (
-  //     <p>Yummy requires location services. Please enable location services and refresh this page.</p>
-  //   )
-  // }
 
   return (
     <div>
