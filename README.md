@@ -33,6 +33,7 @@ You will need a _Yelp Fusion_ API key and update the `.env.dist` file in the `ba
 - [ ] #11
 - [ ] #9
 - [ ] #8
+- [ ] Figure out wwhy the issues aren't showing up in this list correctly
 
 ## Contributing
 This is an open source project, and anybody is welcome to contribute. If there are any suggestions, criticisms, bugs, feel free to open an issue as well.
