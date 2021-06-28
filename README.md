@@ -1,6 +1,14 @@
 # [yummy-src](https://iisangil.github.io/yummy)
 This repo contains the source code for Yummy, a web application developed using React and Go.
 
+## Contents
+- [How To Use](https://github.com/iisangil/yummy-src/blob/main/README.md#how-to-use)
+- [Setting Up Locally](https://github.com/iisangil/yummy-src/blob/main/README.md#setting-up-locally)
+- [Frontend](https://github.com/iisangil/yummy-src/blob/main/README.md#frontend)
+- [Backend](https://github.com/iisangil/yummy-src/blob/main/README.md#backend)
+- [Todo](https://github.com/iisangil/yummy-src/blob/main/README.md#todo)
+- [Contributing](https://github.com/iisangil/yummy-src/blob/main/README.md#contributing)
+
 ## How To Use
 Ensure location services are turned on or Yummy will not work properly.
 
