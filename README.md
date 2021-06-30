@@ -30,10 +30,9 @@ In the `backend` folder, run `go run main.go` to begin running the server.
 You will need a _Yelp Fusion_ API key and update the `.env.dist` file in the `backend` folder. This can be done seen [here](https://www.yelp.com/developers/documentation/v3/authentication)
 
 ## Todo
-- [ ] #11
-- [ ] #9
-- [ ] #8
-- [ ] Figure out wwhy the issues aren't showing up in this list correctly
+- [ ] Make the Room component prettier
+- [ ] Clicking on tinder card opens menu
+- [ ] Include map component to menu to show restaurant location
 
 ## Contributing
 This is an open source project, and anybody is welcome to contribute. If there are any suggestions, criticisms, bugs, feel free to open an issue as well.
