@@ -2,6 +2,7 @@ package restaurant
 
 import (
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -31,16 +32,20 @@ func GetRestaurants(parameters map[string]string) []Business {
 	query.Set("limit", "50")
 	query.Set("open_now", "true")
 
-	switch parameters["price"] {
-	case "4":
-		query.Set("price", "1,2,3,4")
-	case "3":
-		query.Set("price", "1,2,3")
-	case "2":
-		query.Set("price", "1,2")
-	case "1":
-		query.Set("price", "1")
+	fmt.Println("parameter price", parameters["price"])
+
+	price := parameters["price"]
+	if price == "" {
+		fmt.Println("price == nothing")
+		price = "1,2,3,4"
 	}
+	if price[len(price)-1] == ',' {
+		price = price[:len(price)-1]
+		fmt.Println("set price to", price)
+	}
+	query.Set("price", price)
+
+	fmt.Println("price", price)
 
 	req.URL.RawQuery = query.Encode()
 
@@ -59,6 +64,11 @@ func GetRestaurants(parameters map[string]string) []Business {
 	err = json.Unmarshal(body, &yelpResponse)
 	if err != nil {
 		log.Panic("error unmarshalling response body:", err)
+	}
+	fmt.Printf("%+v\n", yelpResponse)
+
+	for i := 0; i < len(yelpResponse.Businesses); i++ {
+		fmt.Println("restaurant:", yelpResponse.Businesses[i])
 	}
 
 	businesses := yelpResponse.Businesses
